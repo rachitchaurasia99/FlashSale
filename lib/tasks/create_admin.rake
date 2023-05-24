@@ -1,18 +1,31 @@
 namespace :admin do
   desc "Create Admin User"
   task :new => :environment do
+
+    admin = User.new
+
+    puts "Enter admin's first name: "
+    admin.first_name = STDIN.gets.chomp
+
+    puts "Enter admin's last name: "
+    admin.last_name = STDIN.gets.chomp
+
     puts "Enter an email address: "
-    email = STDIN.gets
+    admin.email = STDIN.gets.chomp
+
     puts "Enter a password: "
-    password = STDIN.gets
-    unless email.strip!.blank? || password.strip!.blank?
-      user = User.new(role: 'admin', email: email, password: password)
-      user.skip_confirmation!
-      if user.save
-        puts "The admin was created successfully"
-      else
-        puts "Sorry, the admin was not created!"
-      end
+    admin.password = STDIN.gets.chomp
+
+    puts "Please confirm your password: "
+    admin.password_confirmation = STDIN.gets.chomp
+
+    admin.skip_confirmation!
+
+    if admin.save
+      puts "The admin was created successfully"
+    else
+      admin.errors.full_messages.each { |full_message| puts full_message }
+      puts "Sorry, the admin was not created!"
     end
   end
 end
