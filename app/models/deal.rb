@@ -34,6 +34,8 @@ class Deal < ApplicationRecord
 
   def check_publishablity
     self.publishable = true
-    valid?
+    if valid?
+      update_column(:publishable, true)
+    end
   end
 end

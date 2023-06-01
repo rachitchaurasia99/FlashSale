@@ -45,7 +45,7 @@ class Admin::DealsController < ApplicationController
   end
 
   def check_publishablity
-    if @deal.valid?
+    if @deal.check_publishablity
       flash[:notice] = "Deal can be Published"
     else
       flash[:error] = 'Deal cannot be Published'
