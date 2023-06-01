@@ -1,0 +1,63 @@
+<%= form_with(model: [:admin, deal]) do |form| %>
+  <% if deal.errors.any? %>
+    <div style="color: red">
+      <h2><%= pluralize(deal.errors.count, "error") %> prohibited this deal from being saved:</h2>
+
+      <ul>
+        <% deal.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div>
+    <%= form.label :title %>
+    <%= form.text_field :title %>
+  </div>
+
+  <div>
+    <%= form.label :description %>
+    <%= form.text_area :description %>
+  </div>
+
+  <div>
+    <%= form.label :quantity %>
+    <%= form.text_field :quantity %>
+  </div>
+
+  <div>
+    <%= form.label :price %>
+    <%= form.text_field :price %>
+  </div>
+
+  <div>
+    <%= form.label :cents %>
+    <%= form.text_field :cents %>
+  </div>
+
+  <div>
+    <%= form.label :discount_cents %>
+    <%= form.text_field :discount_cents %>
+  </div>
+
+  <div>
+    <%= link_to_add_fields "Add Images", form, :deal_images %>
+  </div>
+
+  <div>
+    <%= form.label :deals_tax %>
+    <%= form.text_field :deals_tax %>
+  </div>
+
+  <div>
+    <%= form.label :publish_date %>
+    <%= form.date_field :publish_date %>
+  </div>
+
+  </br>
+
+  <div>
+    <%= form.submit %>
+  </div>
+<% end %>

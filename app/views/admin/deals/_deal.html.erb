@@ -1,0 +1,32 @@
+<%= javascript_include_tag 'slider' %>
+<div id="<%= dom_id deal %>">
+  <u><%= link_to "#{deal.title}", admin_deal_path(deal) %></u>
+  </br>
+
+  <div class="image-slider">
+  
+  <% deal.deal_images.each do |deal_image| %>
+    <%= image_tag(url_for(deal_image.image), class: 'slider_image') %>
+  <% end %>
+
+  <% deal.images_count.times do |i| %>
+    <span class="dot" onclick="showSlide(<%= 0 %>, <%= i %>)"></span>
+  <% end %>
+  </div>
+
+  <div>
+    <strong>Description </strong>
+    <%= deal.description %>
+  </div>
+
+  <div>
+    <strong>Original Price</strong>
+    <s><%= deal.price_in_decimal(deal.price, deal.cents).to_fs(:currency, format: '%u %n') %></s>
+  </div>
+
+  <div>
+    <strong>Deal Price</strong>
+    <%= deal.price_in_decimal(deal.price, deal.discount_cents).to_fs(:currency, format: '%u %n') %>
+  </div>
+</div>
+

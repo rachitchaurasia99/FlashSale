@@ -9,9 +9,19 @@ class User::SessionsController < Devise::SessionsController
   # end
 
   # POST /resource/sign_in
-  # def create
-  #   super
-  # end
+  def create
+    self.resource = warden.authenticate!(auth_options)
+    set_flash_message!(:notice, :signed_in)
+    assign_path
+  end
+
+  def assign_path
+    if current_user.admin?
+      redirect_to admin_deals_path
+    else
+      redirect_to store_homepage_path
+    end
+  end
 
   # DELETE /resource/sign_out
   # def destroy
