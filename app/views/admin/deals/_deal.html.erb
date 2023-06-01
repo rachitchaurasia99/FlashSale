@@ -3,10 +3,10 @@
   <u><%= link_to "#{deal.title}", admin_deal_path(deal) %></u>
   </br>
 
-  <div class="image-slider">
+  <div>
   
   <% deal.deal_images.each do |deal_image| %>
-    <%= image_tag(url_for(deal_image.image), class: 'slider_image') %>
+    <%= image_tag(url_for(deal_image.image)) %>
   <% end %>
 
   <% deal.images_count.times do |i| %>
