@@ -2,7 +2,7 @@ namespace :admin do
   desc "Create Admin User"
   task :new => :environment do
 
-    admin = User.new
+    admin = User.new(role: 'Admin')
 
     puts "Enter admin's first name: "
     admin.first_name = STDIN.gets.chomp
