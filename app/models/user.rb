@@ -5,8 +5,4 @@ class User < ApplicationRecord
   enum role: { customer: 0, Admin: 1 }
 
   validates :first_name, presence: true
-
-  def admin?
-    role == 'Admin'
-  end
 end

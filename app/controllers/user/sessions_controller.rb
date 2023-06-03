@@ -16,7 +16,7 @@ class User::SessionsController < Devise::SessionsController
   end
 
   def assign_path
-    if current_user.admin?
+    if current_user.Admin?
       redirect_to admin_deals_path
     else
       redirect_to store_homepage_path

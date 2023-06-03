@@ -2,22 +2,22 @@ class Deal < ApplicationRecord
   has_many :deal_images, dependent: :delete_all
   accepts_nested_attributes_for :deal_images, allow_destroy: true, reject_if: proc { |attributes| attributes[:image].blank? }
 
-  validates :title, :description, :price, :cents, :discount_cents, :quantity, :deals_tax, presence: true
+  validates :title, :description, :price_in_cents, :discount_price_in_cents, :quantity, :deals_tax, presence: true
 
-  validates_with PublishDateValidator
+  validate :valid_publish_date?
 
   validates :scheduled_deals_count, numericality: { less_than: 2, message: "No more than 2 deals can be published in one day" }, unless: :published_date
 
-  validates :discount_cents, numericality: { less_than_equal_to: :cents }
+  validates :discount_price_in_cents, numericality: { less_than_equal_to: :price_in_cents }
 
-  with_options if: :publishable? do
+  with_options if: :published_date? do
     validates :quantity, numericality: { greater_than: 10, message: ' should be greater than 10' }
     validates :images_count, numericality: { greater_than: 1, message: 'should be greater than 2' }
     validates :deals_tax, numericality: { in: 0..28 }, allow_blank: true
   end
 
-  after_save :check_publishablity
-
+  scope :live, ->{ where(publishable: true).where.not(published_date: nil) }
+  scope :expired, ->{ where(publishable: false).where.not(published_date: nil) }
   scope :publishable_on, ->(date) { where(publish_date: date) }
 
   def images_count
@@ -34,8 +34,14 @@ class Deal < ApplicationRecord
 
   def check_publishablity
     self.publishable = true
-    if valid?
-      update_column(:publishable, true)
+    valid?
+  end
+
+  def valid_publish_date?
+    if publishable && publish_date_was
+      unless publish_date_was - Time.current > TWENTY_FOUR_HOURS
+        errors.add :base, "Cannot update publish_date 24 hours before deal going live"
+      end
     end
   end
 end

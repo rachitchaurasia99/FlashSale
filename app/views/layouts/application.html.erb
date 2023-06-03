@@ -14,18 +14,19 @@
   </head>
 
   <body>
-  <nav>
-    <% if user_signed_in? %>
-      <%= button_to 'Log out', destroy_user_session_path, method: :delete %>
-      <%= link_to 'Edit Profile', edit_user_registration_path %>
-    <% else %>
-      <%= link_to 'Login', new_user_session_path %>
-      |
-      <%= link_to 'Sign_Up', new_user_registration_path %>
+    <nav>
+      <% if user_signed_in? %>
+        <%= button_to 'Log out', destroy_user_session_path, method: :delete %>
+        <%= link_to 'Edit Profile', edit_user_registration_path %>
+      <% else %>
+        <%= link_to 'Login', new_user_session_path %>
+        |
+        <%= link_to 'Sign_Up', new_user_registration_path %>
+      <% end %>
+    </nav>
+    <% if flash[:error] %>
+      <p class="alert alert-danger" ><%= flash[:notice] %></p>
     <% end %>
-  </nav>
-  <p class="notice"><%= notice %></p>
-  <p class="notice"><%= flash[:error] %></p>
     <%= yield %>
   </body>
 </html>

@@ -2,6 +2,6 @@ class StoreController < ApplicationController
   skip_before_action :authenticate_user!
   
   def homepage
-    @deals = Deal.where(publishable: true)
+    @deals = Deal.live
   end
 end

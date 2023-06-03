@@ -1,5 +1,5 @@
 <%= render @deal %>
-<%= button_to 'Destroy this deal', admin_deal_path(@deal.id), method: :delete %>
+<%= button_to 'Destroy this deal', admin_deal_path(@deal), method: :delete %>
 </br>
 <div>
   <%= link_to 'Edit this deal', edit_admin_deal_path(@deal) %>

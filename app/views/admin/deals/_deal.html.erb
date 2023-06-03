@@ -3,14 +3,9 @@
   </br>
 
   <div>
-  
-  <% deal.deal_images.each do |deal_image| %>
-    <%= image_tag(url_for(deal_image.image)) %>
-  <% end %>
-
-  <% deal.images_count.times do |i| %>
-    <span class="dot" onclick="showSlide(<%= 0 %>, <%= i %>)"></span>
-  <% end %>
+    <% deal.deal_images.each do |deal_image| %>
+      <%= image_tag(url_for(deal_image.image), class: 'slider_image') %>
+    <% end %>
   </div>
 
   <div>
@@ -19,13 +14,17 @@
   </div>
 
   <div>
+    <strong>Quantity</strong>
+    <%= deal.quantity %>
+  </div>
+
+  <div>
     <strong>Original Price</strong>
-    <s><%= deal.price_in_decimal(deal.price, deal.cents).to_fs(:currency, format: '%u %n') %></s>
+    <s><%= price_in_decimal(deal.price_in_cents).to_fs(:currency, format: '%u %n') %></s>
   </div>
 
   <div>
     <strong>Deal Price</strong>
-    <%= deal.price_in_decimal(deal.price, deal.discount_cents).to_fs(:currency, format: '%u %n') %>
+    <%= price_in_decimal(deal.discount_price_in_cents).to_fs(:currency, format: '%u %n') %>
   </div>
 </div>
-

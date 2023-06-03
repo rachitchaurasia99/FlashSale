@@ -12,6 +12,11 @@
   <% end %>
 
   <div>
+    <%= form.label :publishable %>
+    <%= form.check_box :publishable %>
+  </div>
+
+  <div>
     <%= form.label :title %>
     <%= form.text_field :title %>
   </div>
@@ -27,18 +32,13 @@
   </div>
 
   <div>
-    <%= form.label :price %>
-    <%= form.text_field :price %>
+    <%= form.label :price_in_cents %>
+    <%= form.text_field :price_in_cents %>
   </div>
 
   <div>
-    <%= form.label :cents %>
-    <%= form.text_field :cents %>
-  </div>
-
-  <div>
-    <%= form.label :discount_cents %>
-    <%= form.text_field :discount_cents %>
+    <%= form.label :discount_price_in_cents %>
+    <%= form.text_field :discount_price_in_cents %>
   </div>
 
   <div>

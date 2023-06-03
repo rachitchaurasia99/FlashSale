@@ -18,29 +18,26 @@ class Admin::DealsController < ApplicationController
 
   def create
     @deal = Deal.new(deal_params)
-    respond_to do |format|
       if @deal.save
-        format.html { redirect_to admin_deal_path(@deal), notice: "Deal was successfully created." }
+        redirect_to admin_deals_path, notice: "Deal was successfully created."
       else
-        format.html { render :new, status: :unprocessable_entity }
+        render :new, status: :unprocessable_entity
       end
-    end
   end
 
   def update
-    respond_to do |format| 
-      if @deal.update(deal_params)
-        format.html { redirect_to admin_deal_url(@deal), notice: "Deal was successfully updated." }
-      else
-        format.html { render :new, status: :unprocessable_entity }
-      end
+    if @deal.update(deal_params)
+      redirect_to admin_deals_path, notice: "Deal was successfully updated."
+    else
+      render :new, status: :unprocessable_entity 
     end
   end
 
   def destroy
-    @deal.destroy
-    respond_to do |format|
-      format.html { redirect_to admin_deals_path, notice: "Deal was successfully destroyed." }
+    if @deal.destroy
+      redirect_to admin_deals_path, notice: "Deal was successfully destroyed."
+    else
+      render :new, status: :unprocessable_entity 
     end
   end
 
@@ -56,15 +53,16 @@ class Admin::DealsController < ApplicationController
   private 
 
   def set_deal
-    @deal = Deal.find(params[:id])
+    @deal = Deal.find_by(id: params[:id])
+    redirect_to admin_deals_path, notice: "Deal Not found" unless @deal
   end
 
   def deal_params
-    params.require(:deal).permit(:title, :description, :publishable, :quantity, :price, :cents, :discount_cents, :publish_date, :published_date, :deals_tax, deal_images_attributes: [:image] )
+    params.require(:deal).permit(:title, :description, :publishable, :quantity, :price_in_cents, :discount_price_in_cents, :publish_date, :published_date, :deals_tax, deal_images_attributes: [:image] )
   end
 
   def check_admin
-    redirect_to store_homepage_path unless current_user.admin?
+    redirect_to store_homepage_path unless current_user.Admin?
   end
    
 end

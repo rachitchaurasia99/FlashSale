@@ -7,4 +7,8 @@ module ApplicationHelper
     end
     link_to(name, '#', class: "add_fields", data: {id: id, fields: fields.gsub("\n", "")})
   end
+
+  def price_in_decimal(price)
+    price/100
+  end
 end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_05_31_113343) do
+ActiveRecord::Schema[7.0].define(version: 2023_05_27_164258) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -42,16 +42,6 @@ ActiveRecord::Schema[7.0].define(version: 2023_05_31_113343) do
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
-  create_table "crono_jobs", force: :cascade do |t|
-    t.string "job_id", null: false
-    t.text "log"
-    t.datetime "last_performed_at"
-    t.boolean "healthy"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["job_id"], name: "index_crono_jobs_on_job_id", unique: true
-  end
-
   create_table "deal_images", force: :cascade do |t|
     t.bigint "deal_id", null: false
     t.datetime "created_at", null: false
@@ -62,12 +52,11 @@ ActiveRecord::Schema[7.0].define(version: 2023_05_31_113343) do
   create_table "deals", force: :cascade do |t|
     t.string "title"
     t.string "description"
-    t.integer "price"
-    t.integer "cents"
-    t.integer "discount_cents"
+    t.integer "price_in_cents"
+    t.integer "discount_price_in_cents"
     t.integer "quantity", default: 0
-    t.date "publish_date"
-    t.date "published_date"
+    t.datetime "publish_date"
+    t.datetime "published_date"
     t.boolean "publishable", default: false
     t.decimal "deals_tax", precision: 8, scale: 2
     t.datetime "created_at", null: false
