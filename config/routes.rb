@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
-  root "store#homepage", as: 'store_homepage', via: :all
+  root "store#homepage"
   devise_for :users, controllers: { :sessions => "user/sessions" }
 
   namespace :admin do
