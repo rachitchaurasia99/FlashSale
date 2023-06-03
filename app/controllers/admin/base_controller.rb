@@ -1,0 +1,7 @@
+class Admin::BaseController < ApplicationController
+  before_action :check_admin
+  
+  def check_admin
+    redirect_to store_homepage_path unless current_user.Admin?
+  end
+end
