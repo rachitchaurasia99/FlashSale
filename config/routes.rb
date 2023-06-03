@@ -1,4 +1,4 @@
 Rails.application.routes.draw do
-  root "store#homepage", as: 'store_homepage', via: :all
+  root "store#homepage"
   devise_for :users
 end
