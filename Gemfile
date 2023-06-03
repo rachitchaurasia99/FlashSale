@@ -4,7 +4,7 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 ruby "3.2.2"
 
 # Install devise gem
-gem 'devise'
+gem "devise", "~> 4.9.2"
 
 gem 'pg'
 
