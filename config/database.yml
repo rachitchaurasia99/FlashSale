@@ -8,8 +8,8 @@ default: &default
 development:
   <<: *default
   database: flashsale_development
-  username: postgres
-  password: 1234
+  username: <%= Rails.application.secrets.username %>
+  password: <%= Rails.application.secrets.password %>
   host: localhost
   port: 5432
 
