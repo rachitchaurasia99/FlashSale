@@ -6,8 +6,7 @@
 <% end %>
 
 </br>
-
-<% @deals.each do |deal| %>
+<% @live_deals&.each do |deal| %>
   <%= render deal %>
   </br>
 <% end %>
