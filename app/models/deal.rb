@@ -24,10 +24,6 @@ class Deal < ApplicationRecord
     deal_images.count
   end
 
-  def price_in_decimal(price, cents)
-    cents/price
-  end
-
   def scheduled_deals_count
     self.class.publishable_on(self.publish_date).size
   end

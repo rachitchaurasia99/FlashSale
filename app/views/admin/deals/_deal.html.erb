@@ -4,7 +4,7 @@
 
   <div>
     <% deal.deal_images.each do |deal_image| %>
-      <%= image_tag(url_for(deal_image.image), class: 'slider_image') %>
+      <%= image_tag(url_for(deal_image.image)) %>
     <% end %>
   </div>
 
