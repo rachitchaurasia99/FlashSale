@@ -19,13 +19,11 @@ class Deal < ApplicationRecord
   scope :live, ->{ where(publishable: true).where.not(published_date: nil) }
   scope :expired, ->{ where(publishable: false).where.not(published_date: nil) }
   scope :publishable_on, ->(date) { where(publish_date: date) }
-
+  scope :to_publish, ->{ where(publish_date: Date.current).where(published_date: nil).where(publishable: true) }
+  scope :to_unpublish, ->{ where(publish_date: Date.current).where.not(published_date: nil).where(publishable: true) }
+  
   def images_count
     deal_images.count
-  end
-
-  def price_in_decimal(price, cents)
-    cents/price
   end
 
   def scheduled_deals_count
@@ -38,7 +36,7 @@ class Deal < ApplicationRecord
   end
 
   def valid_publish_date?
-    if publishable && publish_date_was
+    if publish_date_changed? && publishable && publish_date_was
       unless publish_date_was - Time.current > TWENTY_FOUR_HOURS
         errors.add :base, "Cannot update publish_date 24 hours before deal going live"
       end

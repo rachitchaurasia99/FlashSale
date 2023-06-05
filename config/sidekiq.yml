@@ -1,0 +1,6 @@
+# Runs everyday at 10 am
+:scheduler:
+  :schedule:
+    publish_deal:
+      cron: '0 10 * * * *'
+      class: PublishDeal
