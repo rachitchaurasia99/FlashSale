@@ -2,5 +2,5 @@
 :scheduler:
   :schedule:
     publish_deal:
-      cron: '0 10 * * * *'
+      cron: '0 0 10 * * *'
       class: PublishDeal
