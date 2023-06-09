@@ -1,5 +1,7 @@
 class Deal < ApplicationRecord
   has_many :deal_images, dependent: :delete_all
+  has_many :line_items, dependent: :restrict_with_exception
+
   accepts_nested_attributes_for :deal_images, allow_destroy: true, reject_if: proc { |attributes| attributes[:image].blank? }
 
   validates :title, :description, :price_in_cents, :discount_price_in_cents, :quantity, :deals_tax, presence: true

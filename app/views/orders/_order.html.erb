@@ -1,0 +1,18 @@
+<div>
+  <h4><u><%= "Order #{order.id}" %></u></h4>
+  </br>
+
+  <div>
+    <strong>Name</strong>
+    <%= order.address.name %>
+  </div>
+
+  <div>
+    <strong>Total amount</strong>
+    <%= price_in_decimal(order.payment.total_amount_in_cents).to_fs(:currency, unit: '₹', format: '%u %n') %>
+  </div>
+
+  <div>
+    <%= link_to 'Order Details', order_path(order) %>
+  </div>
+</div>

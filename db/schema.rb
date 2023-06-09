@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_05_27_164258) do
+ActiveRecord::Schema[7.0].define(version: 2023_06_05_074133) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -42,6 +42,21 @@ ActiveRecord::Schema[7.0].define(version: 2023_05_27_164258) do
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
+  create_table "addresses", force: :cascade do |t|
+    t.string "name"
+    t.string "email"
+    t.bigint "user_id"
+    t.bigint "order_id"
+    t.string "city"
+    t.string "state"
+    t.string "country"
+    t.integer "pincode"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["order_id"], name: "index_addresses_on_order_id"
+    t.index ["user_id"], name: "index_addresses_on_user_id"
+  end
+
   create_table "deal_images", force: :cascade do |t|
     t.bigint "deal_id", null: false
     t.datetime "created_at", null: false
@@ -61,6 +76,40 @@ ActiveRecord::Schema[7.0].define(version: 2023_05_27_164258) do
     t.decimal "deals_tax", precision: 8, scale: 2
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "line_items", force: :cascade do |t|
+    t.bigint "deal_id", null: false
+    t.bigint "order_id", null: false
+    t.integer "quantity"
+    t.integer "price_in_cents"
+    t.integer "discount_price_in_cents"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["deal_id"], name: "index_line_items_on_deal_id"
+    t.index ["order_id"], name: "index_line_items_on_order_id"
+  end
+
+  create_table "orders", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "address_id"
+    t.integer "status"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["address_id"], name: "index_orders_on_address_id"
+    t.index ["user_id"], name: "index_orders_on_user_id"
+  end
+
+  create_table "payments", force: :cascade do |t|
+    t.bigint "order_id"
+    t.string "transaction_id"
+    t.string "currency"
+    t.string "status"
+    t.string "type"
+    t.integer "total_amount_in_cents"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["order_id"], name: "index_payments_on_order_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -86,4 +135,8 @@ ActiveRecord::Schema[7.0].define(version: 2023_05_27_164258) do
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "deal_images", "deals"
+  add_foreign_key "line_items", "deals"
+  add_foreign_key "line_items", "orders"
+  add_foreign_key "orders", "addresses"
+  add_foreign_key "orders", "users"
 end

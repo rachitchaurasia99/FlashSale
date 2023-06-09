@@ -1,0 +1,17 @@
+<h1>Order Summary</h1>
+<% @order.line_items.each do |line_item| %>
+  <%= render line_item %>
+  <%= button_to 'Remove' , line_item_path(line_item), method: :delete%>
+  </br>
+<% end %>
+</br>
+<div>
+  <strong>Tax amount</strong>
+  <%= price_in_decimal(@order.total_tax).to_fs(:currency, unit: '₹', format: '%u %n') %>
+</div>
+<div>
+  <strong>Order Total</strong>
+  <%= price_in_decimal(@order.order_total).to_fs(:currency, unit: '₹', format: '%u %n') %>
+</div>
+</br>
+<%= button_to 'Place Order', checkout_order_path(@order), method: :get %>
