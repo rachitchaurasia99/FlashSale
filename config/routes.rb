@@ -3,7 +3,7 @@ Rails.application.routes.draw do
   devise_for :users, controllers: { :sessions => "user/sessions", :registrations => "user/registrations" }
 
   devise_scope :user do
-    get 'users/profile', to: 'user/registrations#profile'
+    get 'profile', to: 'user/registrations#profile'
   end
 
   resources :users do
