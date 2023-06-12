@@ -70,7 +70,7 @@ class OrdersController < ApplicationController
       success_url:  success_order_url,
       cancel_url: cancel_order_url
     )
-    @order.create_payment(transaction_id: session.id, currency: session.currency, status: 'Pending', type: 'Payment', total_amount_in_cents: @order.order_total)
+    @order.create_payment(transaction_id: session.id, currency: session.currency, status: 'Pending', total_amount_in_cents: @order.order_total)
     redirect_to session.url, allow_other_host: true
   end
 
@@ -81,7 +81,7 @@ class OrdersController < ApplicationController
   end
 
   def cancel
-    @order.payment.update_column(status: 'Cancelled')
+    @order.payment.update_column(status: 'Failed')
   end
 
   private 

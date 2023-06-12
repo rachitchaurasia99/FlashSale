@@ -104,8 +104,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_06_10_133458) do
     t.bigint "order_id"
     t.string "transaction_id"
     t.string "currency"
-    t.string "status"
-    t.string "type"
+    t.integer "status"
     t.integer "total_amount_in_cents"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false

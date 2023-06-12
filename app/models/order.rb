@@ -1,7 +1,7 @@
 class Order < ApplicationRecord
   include ActiveModel::Serialization
 
-  enum :status, {'In Progress': 0, 'Placed': 1, 'Delivered': 2, 'Cancelled': 1}
+  enum :status, {'In Progress': 0, 'Placed': 1, 'Delivered': 2, 'Cancelled': 3}
   
   belongs_to :user
   has_one :payment
