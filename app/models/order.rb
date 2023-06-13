@@ -2,11 +2,11 @@ class Order < ApplicationRecord
   enum :status, {'In Progress': 0, 'Placed': 1, 'Delivered': 2, 'Cancelled': 3}
   
   belongs_to :user
+  belongs_to :address, optional: true
   has_many :payments
   has_many :line_items, dependent: :destroy
   has_many :deals, through: :line_items
 
-  has_one :address
   accepts_nested_attributes_for :address, allow_destroy: true
 
   def total_tax

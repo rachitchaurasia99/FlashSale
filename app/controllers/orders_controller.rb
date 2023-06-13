@@ -70,18 +70,18 @@ class OrdersController < ApplicationController
       success_url:  success_order_url,
       cancel_url: cancel_order_url
     )
-    @order.create_payment(transaction_id: session.id, currency: session.currency, status: 'Pending', total_amount_in_cents: @order.order_total)
+    @order.payments.create(transaction_id: session.id, currency: session.currency, status: 'Pending', total_amount_in_cents: @order.order_total)
     redirect_to session.url, allow_other_host: true
   end
 
   def success
     @order.update_column(:status, 'Placed')
-    @order.payment.update_column(:status, 'Successful')
+    @order.payments.last.update_column(:status, 'Successful')
     OrderMailer.received(Order.last).deliver_later
   end
 
   def cancel
-    @order.payment.update_column(status: 'Failed')
+    @order.payments.last.update_column(status: 'Failed')
   end
 
   private 

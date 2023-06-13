@@ -1,5 +1,4 @@
 class LineItem < ApplicationRecord
-
   belongs_to :deal
   belongs_to :order
 

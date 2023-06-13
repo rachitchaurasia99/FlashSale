@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_06_10_133458) do
+ActiveRecord::Schema[7.0].define(version: 2023_06_13_112347) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -93,6 +93,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_06_10_133458) do
   create_table "orders", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.bigint "address_id"
+    t.date "order_date"
     t.integer "status"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -102,13 +103,25 @@ ActiveRecord::Schema[7.0].define(version: 2023_06_10_133458) do
 
   create_table "payments", force: :cascade do |t|
     t.bigint "order_id"
-    t.string "transaction_id"
+    t.string "payment_intent"
     t.string "currency"
     t.integer "status"
     t.integer "total_amount_in_cents"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "session_id"
     t.index ["order_id"], name: "index_payments_on_order_id"
+  end
+
+  create_table "refunds", force: :cascade do |t|
+    t.bigint "order_id"
+    t.string "refund_id"
+    t.string "currency"
+    t.integer "status"
+    t.integer "total_amount_in_cents"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["order_id"], name: "index_refunds_on_order_id"
   end
 
   create_table "users", force: :cascade do |t|
