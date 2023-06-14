@@ -2,8 +2,8 @@ class OrdersController < ApplicationController
   before_action :set_order, only: %i[show edit update destroy payment success cancel]
   
   def index
-    @orders = Order.placed_orders
-    @orders = Order.users_placed_orders(params[:user_id]) if params[:user_id]
+    @orders = Order.all
+    @orders = Order.where(user_id: params[:user_id]).where(status: 'Placed') if params[:user_id]
   end
 
   def new
@@ -70,18 +70,18 @@ class OrdersController < ApplicationController
       success_url:  success_order_url,
       cancel_url: cancel_order_url
     )
-    @order.payments.create(transaction_id: session.id, currency: session.currency, status: 'Pending', total_amount_in_cents: @order.order_total)
+    @order.create_payment(transaction_id: session.id, currency: session.currency, status: 'Pending', type: 'Payment', total_amount_in_cents: @order.order_total)
     redirect_to session.url, allow_other_host: true
   end
 
   def success
     @order.update_column(:status, 'Placed')
-    @order.payments.last.update_column(:status, 'Successful')
+    @order.payment.update_column(:status, 'Successful')
     OrderMailer.received(Order.last).deliver_later
   end
 
   def cancel
-    @order.payments.last.update_column(status: 'Failed')
+    @order.payment.update_column(status: 'Cancelled')
   end
 
   private 

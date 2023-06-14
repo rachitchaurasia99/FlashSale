@@ -1,10 +1,6 @@
 Rails.application.routes.draw do
   root "store#homepage"
-  devise_for :users, controllers: { :sessions => "user/sessions", :registrations => "user/registrations" }
-
-  devise_scope :user do
-    get 'profile', to: 'user/registrations#profile'
-  end
+  devise_for :users, controllers: { :sessions => "user/sessions" }
 
   resources :users do
     resources :orders
@@ -28,17 +24,6 @@ Rails.application.routes.draw do
   resources :address
   resources :payments, only: [:new, :create]
   
-  namespace :api do
-    controller :deals do
-      get 'deals/live' => :live
-      get 'deals/past' => :past
-    end
-
-    controller :users do
-      get 'my_orders/:auth_token' => :my_orders
-    end
-  end
-
   namespace :admin do
     resources :deals do
       patch 'check_publishablity', to: 'deals#check_publishablity', on: :member

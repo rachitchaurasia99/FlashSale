@@ -4,7 +4,8 @@ class CreatePayments < ActiveRecord::Migration[7.0]
       t.references :order
       t.string :transaction_id
       t.string :currency
-      t.integer :status
+      t.string :status
+      t.string :type
       t.integer :total_amount_in_cents
       
       t.timestamps

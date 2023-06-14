@@ -13,18 +13,16 @@
     </div>
   <% end %>
 
-  <% if current_user.addresses.any? %>
-    <div class="btn-group-vertical" data-toggle="buttons">
-      <%= form.collection_radio_buttons :address_id, current_user.addresses, :id, :name, checked: current_user.addresses.last.id do |address| %>
-        <div class="btn btn-secondary back-colour">
-          <div class="card card-body bg-custom">
-            <%= address.radio_button %>
-            <%= render address.object  %>
-          </div>
+  <div class="btn-group-vertical" data-toggle="buttons">
+    <%= form.collection_radio_buttons :address_id, current_user.addresses, :id, :name, checked: current_user.addresses.last.id do |address| %>
+      <div class="btn btn-secondary back-colour">
+        <div class="card card-body bg-custom">
+          <%= address.radio_button %>
+          <%= render address.object  %>
         </div>
-      <% end %>
-    </div>
-  <% end %>
+      </div>
+    <% end %>
+  </div>
 
   <div>
     <%= link_to_add_fields "Add New Address", form, :address %>

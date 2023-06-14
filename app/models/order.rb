@@ -1,19 +1,14 @@
 class Order < ApplicationRecord
-  include ActiveModel::Serialization
-
-  enum :status, {'In Progress': 0, 'Placed': 1, 'Delivered': 2, 'Cancelled': 3}
+  enum :status, {'In Progress': 0, 'Placed': 1, 'Delivered': 2, 'Cancelled': 1}
   
   belongs_to :user
-  belongs_to :address, optional: true
-  has_many :payments
+  has_one :payment
   has_many :line_items, dependent: :destroy
   has_many :deals, through: :line_items
 
+  has_one :address
   accepts_nested_attributes_for :address, allow_destroy: true
 
-  scope :placed_orders, ->{ includes(:address, :payments).where.not(status: 'In Progress').where(payments: { status: 'Successful' }) }
-  scope :users_placed_orders, ->(user_id){ where(user_id: user_id).placed_orders }
-  
   def total_tax
     line_items.sum(&:tax_on_deal)
   end
@@ -31,9 +26,6 @@ class Order < ApplicationRecord
     else
       total
     end
-  end
-    
-  def serialize
-    serializable_hash(only: [:id, :deal_id, :address_id, :status])
+
   end
 end

@@ -6,7 +6,6 @@ class User < ApplicationRecord
 
   has_many :orders
   has_many :addresses, dependent: :destroy
-  has_secure_token :auth_token
 
   validates :first_name, presence: true
 end
