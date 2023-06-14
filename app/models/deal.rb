@@ -1,4 +1,6 @@
 class Deal < ApplicationRecord
+  include ActiveModel::Serialization
+
   has_many :deal_images, dependent: :delete_all
   has_many :line_items, dependent: :restrict_with_exception
 
@@ -43,5 +45,9 @@ class Deal < ApplicationRecord
         errors.add :base, "Cannot update publish_date 24 hours before deal going live"
       end
     end
+  end
+
+  def serialize
+    serializable_hash(only: [:id, :title, :description, :quantity, :price_in_cents, :discount_price_in_cents])
   end
 end
