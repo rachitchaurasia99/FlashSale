@@ -70,14 +70,15 @@ class OrdersController < ApplicationController
       success_url:  success_order_url,
       cancel_url: cancel_order_url
     )
-    @order.payments.create(transaction_id: session.id, currency: session.currency, status: 'Pending', total_amount_in_cents: @order.order_total)
+    @order.payments.create(session_id: session.id, currency: session.currency, status: 'Pending', total_amount_in_cents: @order.order_total)
     redirect_to session.url, allow_other_host: true
   end
 
   def success
-    @order.update_column(:status, 'Placed')
-    @order.payments.last.update_column(:status, 'Successful')
-    OrderMailer.received(Order.last).deliver_later
+    checkout_session = Stripe::Checkout::Session.retrieve(@order.payments.last.session_id)
+    @order.update_columns({ status: 'Placed', order_date: Date.current })
+    @order.payments.last.update_columns({ status: 'Successful', payment_intent: checkout_session.payment_intent })
+    OrderMailer.with(order: @order).received.deliver_later
   end
 
   def cancel

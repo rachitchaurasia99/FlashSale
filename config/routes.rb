@@ -40,6 +40,18 @@ Rails.application.routes.draw do
   end
 
   namespace :admin do
+    controller :reports do
+      get 'reports' => :index
+      get 'reports/deals' => :deals
+      get 'reports/customers' => :customers
+    end
+    resources :users
+    resources :orders do
+      member do
+        post 'deliver', to: 'orders#deliver_order'
+        post 'cancel', to: 'orders#cancel_order'
+      end
+    end
     resources :deals do
       patch 'check_publishablity', to: 'deals#check_publishablity', on: :member
     end

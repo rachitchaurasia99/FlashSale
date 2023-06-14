@@ -3,6 +3,7 @@ class Deal < ApplicationRecord
 
   has_many :deal_images, dependent: :delete_all
   has_many :line_items, dependent: :restrict_with_exception
+  has_many :orders, through: :line_items
 
   accepts_nested_attributes_for :deal_images, allow_destroy: true, reject_if: proc { |attributes| attributes[:image].blank? }
 
@@ -25,7 +26,8 @@ class Deal < ApplicationRecord
   scope :publishable_on, ->(date) { where(publish_date: date) }
   scope :to_publish, ->{ where(publish_date: Date.current).where(published_date: nil).where(publishable: true) }
   scope :to_unpublish, ->{ where(publish_date: Date.current).where.not(published_date: nil).where(publishable: true) }
-  
+  scope :delivered_orders, ->{ includes(:orders).where(orders: {status: 'Delivered'})}
+
   def images_count
     deal_images.count
   end
@@ -49,5 +51,15 @@ class Deal < ApplicationRecord
 
   def serialize
     serializable_hash(only: [:id, :title, :description, :quantity, :price_in_cents, :discount_price_in_cents])
+  end
+
+  def self.deal_revenue
+    deals_with_revenue = {}
+    delivered_orders.map{ |deal| deals_with_revenue.store(deal, deal.orders.length * deal.deal_price_with_tax) }
+    deals_with_revenue
+  end
+
+  def deal_price_with_tax
+    discount_price_in_cents + deals_tax  * discount_price_in_cents * 0.01
   end
 end

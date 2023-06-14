@@ -1,4 +1,5 @@
 <%= javascript_include_tag 'add_field' %>
+<%= javascript_include_tag 'dropdown' %>
 <!DOCTYPE html>
 <html>
   <head>
@@ -17,6 +18,9 @@
     <nav class="navbar navbar-light bg-light">
       <%= link_to 'HomePage', root_path%>
       <% if user_signed_in? %>
+        <% if current_user.Admin? %>
+          <%= render 'users/shared/dropdown' %>
+        <% end %>
         <%= link_to 'Profile', profile_path %>
         <%= link_to 'Cart', cart_order_path(current_order.id) %>
         <%= link_to 'My Orders', user_orders_path(current_user) %>
