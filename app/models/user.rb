@@ -18,4 +18,12 @@ class User < ApplicationRecord
     customers_orders(from, to).map { |customer| customers_order_amount.store(customer, customer.payments.sum(:total_amount_in_cents)) }
     customers_order_amount.sort_by { |customer, amount| -amount }
   end
+
+  def soft_delete
+    update(deactivated_at: Time.current)
+  end
+  
+  def active_for_authentication?
+    super && deactivated_at.nil?
+  end
 end

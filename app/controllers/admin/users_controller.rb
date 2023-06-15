@@ -27,11 +27,17 @@ class Admin::UsersController < Admin::BaseController
     end
   end
 
+  def soft_delete
+    @user = User.find(params[:id])
+    @user.soft_delete
+    redirect_to root_path, notice: 'User soft deleted.'
+  end
+
   private 
 
   def set_user
     @user = User.find_by(id: params[:id])
-    redirect_to admin_users_path, notice: "Use Not found" unless @user
+    redirect_to admin_users_path, notice: "User Not found" unless @user
   end
 
   def user_params

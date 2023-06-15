@@ -8,6 +8,9 @@ Rails.application.routes.draw do
 
   resources :users do
     resources :orders
+    member do
+      delete :soft_delete
+    end
   end
   
   resources :line_items
@@ -47,7 +50,11 @@ Rails.application.routes.draw do
       get 'reports/deals' => :deals
       get 'reports/customers' => :customers
     end
-    resources :users
+    resources :users do
+      member do
+        delete :soft_delete
+      end
+    end
     resources :orders do
       member do
         post 'deliver', to: 'orders#deliver_order'
