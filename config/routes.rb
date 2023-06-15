@@ -35,7 +35,7 @@ Rails.application.routes.draw do
     end
 
     controller :users do
-      get 'my_orders/:auth_token' => :my_orders
+      get 'my_orders' => :my_orders
     end
   end
 
