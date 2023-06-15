@@ -14,7 +14,8 @@ class Order < ApplicationRecord
 
   scope :placed_orders, ->{ includes(:address, :payments).where.not(status: 'In Progress').where(payments: { status: 'Successful' }) }
   scope :users_placed_orders, ->(user_id){ where(user_id: user_id).placed_orders }
-  
+  scope :user_order_deals, ->(user_id){ includes(:deals).where(user_id: user_id) }
+
   def total_tax
     line_items.sum(&:tax_on_deal)
   end

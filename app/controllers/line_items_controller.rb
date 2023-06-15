@@ -6,8 +6,8 @@ class LineItemsController < ApplicationController
   end
 
   def create
-    if deal_exists?
-      redirect_to root_path, alert: 'You can only buy one quantity of this deal'
+    if cannot_buy_deal?
+     flash[:alert] = 'You can only buy one quantity of this deal'
     else
       @line_item = current_order.line_items.create(deal_id: @deal.id, quantity: 1, discount_price_in_cents: @deal.discount_price_in_cents, price_in_cents: @deal.price_in_cents)
       @deal.decrement!(:quantity, 1)
@@ -20,12 +20,13 @@ class LineItemsController < ApplicationController
            }
           )
       end
-      redirect_to root_path, notice: 'Item Added'
+      flash[:notice] = 'Item Added'
     end
+    redirect_to root_path
   end
 
-  def deal_exists?
-    current_order.line_items.find_by(deal_id: @deal.id)
+  def cannot_buy_deal?
+    Order.user_order_deals(current_user.id).any? { |order| order.deals.any? { |deal| deal.id == @deal.id } }
   end
 
   def destroy

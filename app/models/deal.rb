@@ -62,4 +62,8 @@ class Deal < ApplicationRecord
   def deal_price_with_tax
     discount_price_in_cents + deals_tax  * discount_price_in_cents * 0.01
   end
+
+  def expiring_soon?
+    published_date + TWENTY_FOUR_HOURS - Time.current < THIRTY_MINUTES
+  end
 end

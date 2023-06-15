@@ -1,5 +1,4 @@
 class Api::DealsController < Api::BaseController
-
   def live 
     render json: Deal.live.map(&:serialize)
   end

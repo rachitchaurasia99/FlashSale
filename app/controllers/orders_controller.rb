@@ -1,5 +1,5 @@
 class OrdersController < ApplicationController
-  before_action :set_order, only: %i[show edit update destroy payment success cancel]
+  before_action :set_order, only: %i[show edit update destroy payment success cancel cancel_order]
   
   def index
     @orders = Order.placed_orders
@@ -83,6 +83,24 @@ class OrdersController < ApplicationController
 
   def cancel
     @order.payments.last.update_column(status: 'Failed')
+  end
+
+  def cancel_order
+    if @order.deals.any? { |deal| deal.expiring_soon? }
+      flash[:notice] = "Order can't be cancelled 30 minutes before the deal ends"
+    else
+      payment_intent = Stripe::PaymentIntent.retrieve(@order.payments.successful.payment_intent)
+      refund = Stripe::Refund.create({
+        payment_intent: payment_intent
+      })
+      @order.refunds.create(refund_id: refund.id, status: 'Successful', currency: 'inr', total_amount_in_cents: refund.amount)
+      @order.update_column(:status, 'Cancelled')
+      OrderMailer.with(order: @order, refund_id: refund.id).cancelled.deliver_later
+      @order.line_items.each do |line_item|
+        line_item.deal.increment!(:quantity)
+      end
+    end
+    redirect_to request.referer
   end
 
   private 

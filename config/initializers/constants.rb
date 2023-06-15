@@ -1,1 +1,2 @@
 TWENTY_FOUR_HOURS = 24.hours
+THIRTY_MINUTES = 30.minutes
