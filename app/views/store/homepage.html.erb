@@ -1,13 +1,5 @@
 <h1>Welcome
-<% if user_signed_in? %>
-  <%= current_user.first_name %> </h1>
-<% else %>
-  </h1>
-<% end %>
-
-</br>
-
-<% @deals.each do |deal| %>
-  <%= render deal %>
-  </br>
-<% end %>
+  <% if user_signed_in? %>
+    <%= current_user.first_name %>
+  <% end %>
+</h1>
