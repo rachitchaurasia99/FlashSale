@@ -2,8 +2,8 @@ class OrdersController < ApplicationController
   before_action :set_order, only: %i[show edit update destroy payment success cancel]
   
   def index
-    @orders = Order.all
-    @orders = Order.where(user_id: params[:user_id]).where(status: 'Placed') if params[:user_id]
+    @orders = Order.placed_orders
+    @orders = Order.users_placed_orders(params[:user_id]) if params[:user_id]
   end
 
   def new

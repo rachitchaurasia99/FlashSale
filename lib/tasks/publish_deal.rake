@@ -4,10 +4,10 @@ task :publish_deal => :environment do
   @unpublishing_deal = Deal.to_unpublish
   count = 0
   @publishing_deal.each do |deal|
-    if count < 2 && deal.update(published_date: Time.current)
+    if count < 2 && deal.update(published_at: Time.current)
       count += 1
     else
-      deal.update_column(:publish_date, Time.current + TWENTY_FOUR_HOURS)
+      deal.update_column(:publish_at, Time.current + TWENTY_FOUR_HOURS)
     end
   end
   @unpublishing_deal.each do |deal|

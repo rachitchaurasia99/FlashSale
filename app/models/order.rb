@@ -9,6 +9,9 @@ class Order < ApplicationRecord
 
   accepts_nested_attributes_for :address, allow_destroy: true
 
+  scope :placed_orders, ->{ includes(:address, :payments).where.not(status: 'In Progress').where(payments: { status: 'Successful' }) }
+  scope :users_placed_orders, ->(user_id){ where(user_id: user_id).placed_orders }
+  
   def total_tax
     line_items.sum(&:tax_on_deal)
   end

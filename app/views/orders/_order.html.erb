@@ -9,7 +9,12 @@
 
   <div>
     <strong>Total amount</strong>
-    <%= price_in_decimal(order.payments.successful.total_amount_in_cents).to_fs(:currency, unit: '₹', format: '%u %n') %>
+    <%= price_on_deal(order.payments.first.total_amount_in_cents) %>
+  </div>
+
+  <div>
+    <strong>Status</strong>
+    <%= order.status %>
   </div>
 
   <div>
