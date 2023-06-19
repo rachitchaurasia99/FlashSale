@@ -55,8 +55,8 @@ ActiveRecord::Schema[7.0].define(version: 2023_05_27_164258) do
     t.integer "price_in_cents"
     t.integer "discount_price_in_cents"
     t.integer "quantity", default: 0
-    t.datetime "publish_date"
-    t.datetime "published_date"
+    t.datetime "publish_at"
+    t.datetime "published_at"
     t.boolean "publishable", default: false
     t.decimal "deals_tax", precision: 8, scale: 2
     t.datetime "created_at", null: false
