@@ -16,13 +16,13 @@ class Deal < ApplicationRecord
     validates :deals_tax, numericality: { in: MINIMUM_TAX_RATE..MAXIMUM_TAX_RATE }, allow_blank: true
   end
 
-  validate :valid_publish_at
+  validate :valid_publish_at, on: :update
 
   scope :live, ->{ where(publishable: true).where.not(published_at: nil) }
   scope :expired, ->{ where(publishable: false).where.not(published_at: nil) }
   scope :publishable_on, ->(date) { where(publish_at: date) }
-  scope :to_publish, ->{ where(publish_at: Date.current).where(published_at: nil).where(publishable: true) }
-  scope :to_unpublish, ->{ where(publish_at: Date.current).where.not(published_at: nil).where(publishable: true) }
+  scope :to_publish, ->{ where(publish_at: Time.current).where(published_at: nil).where(publishable: true) }
+  scope :to_unpublish, ->{ where(publish_at: Time.current).where.not(published_at: nil).where(publishable: true) }
 
   private
   
