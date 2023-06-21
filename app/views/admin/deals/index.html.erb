@@ -1,16 +1,9 @@
-<h1>Welcome
-<% if user_signed_in? %>
-  <%= current_user.first_name %> </h1>
-  <%= link_to 'Add New Deals', new_admin_deal_path %></br>
-<% else %>
-  </h1>
-<% end %>
-
+<h1>Welcome <%= current_user.first_name %> </h1>
+</br>
+<%= link_to 'Add New Deals', new_admin_deal_path %>
+</br>
 </br>
 <% @deals.each_with_index do |deal, index| %>
   <%= render deal, index: index %>
-  <% unless deal.publishable %>
-    <%= button_to 'check_publishability', check_publishablity_admin_deal_path(deal.id), method: :patch %>
-  <% end %>
   </br>
 <% end %>

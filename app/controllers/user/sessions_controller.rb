@@ -9,17 +9,15 @@ class User::SessionsController < Devise::SessionsController
   # end
 
   # POST /resource/sign_in
-  def create
-    self.resource = warden.authenticate!(auth_options)
-    set_flash_message!(:notice, :signed_in)
-    assign_path
-  end
+  # def create
+  #   super
+  # end
 
-  def assign_path
-    if current_user.Admin?
-      redirect_to admin_deals_path
+  def after_sign_in_path_for(resource)
+    if resource.admin?
+      admin_deals_path
     else
-      redirect_to root_path
+      root_path
     end
   end
 

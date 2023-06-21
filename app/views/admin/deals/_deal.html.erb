@@ -20,11 +20,16 @@
 
   <div>
     <strong>Original Price</strong>
-    <s><%= price_in_decimal(deal.price_in_cents).to_fs(:currency, format: '%u %n') %></s>
+    <s><%= price_on_deal(deal.price_in_cents) %></s>
   </div>
 
   <div>
     <strong>Deal Price</strong>
-    <%= price_in_decimal(deal.discount_price_in_cents).to_fs(:currency, format: '%u %n') %>
+    <%= price_on_deal(deal.discount_price_in_cents) %>
+  </div>
+
+  <div>
+    <strong>Publishable: </strong>
+    <%= deal.assign_attributes(published_at: Time.current); deal.valid? ? "YES" : "NO" %>
   </div>
 </div>
