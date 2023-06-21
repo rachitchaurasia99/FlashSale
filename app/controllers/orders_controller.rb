@@ -23,7 +23,6 @@ class OrdersController < ApplicationController
   end
 
   def update
-    @order.build_address
     if @order.update(order_params)
       payment
     else
@@ -48,7 +47,6 @@ class OrdersController < ApplicationController
 
   def checkout
     @order = current_order
-    @order.build_address
   end
 
   def payment
@@ -93,6 +91,6 @@ class OrdersController < ApplicationController
   end
 
   def order_params
-    params.require(:order).permit( :status , :address_id, address_attributes: [:name, :email, :user_id, :city, :state, :country, :pincode] )
+    params.require(:order).permit( :status , :address_id )
   end 
 end
