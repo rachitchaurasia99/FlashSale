@@ -1,6 +1,6 @@
 <td><%= "Order #{order.id}" %></td>
 <td><%= order.address.name %></td>
-<td><%= price_in_decimal(order.payments.first.total_amount_in_cents).to_fs(:currency, unit: '₹', format: '%u %n') %></td>
+<td><%= price_on_deal(order.payments.first.total_amount_in_cents) %></td>
 <td><%= order.status %></td>
 <td><%= link_to 'Order Details', order_path(order) %></td>
 <td><%= button_to 'Set as Delivered?', deliver_admin_order_path(order.id), disabled: (order.Delivered? || order.Cancelled?), class: "btn btn-primary" %></td>

@@ -1,5 +1,5 @@
 <td><%= "Deal #{deal.id}" %></td>
 <td><%= deal.title %></td>
-<td><%= price_in_decimal(total_deal_revenue).to_fs(:currency, unit: '₹', format: '%u %n') %></td>
-<td><%= price_in_decimal(deal.deal_price_with_tax).to_fs(:currency, unit: '₹', format: '%u %n') %>
-<td><%= price_in_decimal(deal.deal_price_with_tax * deal.quantity + total_deal_revenue).to_fs(:currency, unit: '₹', format: '%u %n') %>
+<td><%= price_on_deal(total_deal_revenue) %></td>
+<td><%= price_on_deal(deal.deal_price_with_tax) %>
+<td><%= price_on_deal(deal.deal_price_with_tax * deal.quantity + total_deal_revenue) %>
