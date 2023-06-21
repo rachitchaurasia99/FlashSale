@@ -7,8 +7,6 @@ class Order < ApplicationRecord
   has_many :line_items, dependent: :destroy
   has_many :deals, through: :line_items
 
-  accepts_nested_attributes_for :address, allow_destroy: true
-
   scope :placed_orders, ->{ includes(:address, :payments).where.not(status: 'In Progress').where(payments: { status: 'Successful' }) }
   scope :users_placed_orders, ->(user_id){ where(user_id: user_id).placed_orders }
   

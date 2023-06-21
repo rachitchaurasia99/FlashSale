@@ -23,7 +23,6 @@ class OrdersController < ApplicationController
   end
 
   def update
-    @order.build_address
     if @order.update(order_params)
       payment
     else
@@ -48,7 +47,6 @@ class OrdersController < ApplicationController
 
   def checkout
     @order = current_order
-    @order.build_address
   end
 
   def payment
@@ -70,7 +68,7 @@ class OrdersController < ApplicationController
       success_url:  success_order_url,
       cancel_url: cancel_order_url
     )
-    @order.payments.create(transaction_id: session.id, currency: session.currency, status: 'Pending', total_amount_in_cents: @order.order_total)
+    @order.payments.create(session_id: session.id, currency: session.currency, status: 'Pending', total_amount_in_cents: @order.order_total)
     redirect_to session.url, allow_other_host: true
   end
 
@@ -92,6 +90,6 @@ class OrdersController < ApplicationController
   end
 
   def order_params
-    params.require(:order).permit( :status , :address_id, address_attributes: [:name, :email, :user_id, :city, :state, :country, :pincode] )
+    params.require(:order).permit( :status , :address_id )
   end 
 end

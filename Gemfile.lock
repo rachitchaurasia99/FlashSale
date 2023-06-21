@@ -175,7 +175,6 @@ GEM
     responders (3.1.0)
       actionpack (>= 5.2)
       railties (>= 5.2)
-    spring (4.1.1)
     rufus-scheduler (3.8.2)
       fugit (~> 1.1, >= 1.1.6)
     sidekiq (6.0.7)
@@ -231,9 +230,9 @@ DEPENDENCIES
   pg
   puma (~> 5.0)
   rails (~> 7.0.4, >= 7.0.4.3)
-  spring
   sidekiq (~> 6.0.0)
   sidekiq-scheduler (~> 5.0.3)
+  spring
   sprockets-rails
   stimulus-rails
   stripe (~> 8.5.0)
@@ -242,7 +241,7 @@ DEPENDENCIES
   web-console
 
 RUBY VERSION
-   ruby 3.1.3p185
+   ruby 3.2.2p53
 
 BUNDLED WITH
    2.4.10

@@ -7,6 +7,7 @@ Rails.application.routes.draw do
   end
   
   resources :line_items
+  resources :addresses
 
   resources :orders do
     member do
