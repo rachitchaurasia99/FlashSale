@@ -17,11 +17,11 @@ class Admin::DealsController < Admin::BaseController
 
   def create
     @deal = Deal.new(deal_params)
-      if @deal.save
-        redirect_to admin_deals_path, notice: "Deal was successfully created."
-      else
-        render :new, status: :unprocessable_entity
-      end
+    if @deal.save
+      redirect_to admin_deals_path, notice: "Deal was successfully created."
+    else
+      render :new, status: :unprocessable_entity
+    end
   end
 
   def update
@@ -40,15 +40,6 @@ class Admin::DealsController < Admin::BaseController
     end
   end
 
-  def check_publishablity
-    if @deal.check_publishablity
-      flash[:notice] = "Deal can be Published"
-    else
-      flash[:error] = 'Deal cannot be Published'
-    end
-    redirect_to admin_deals_path
-  end
-
   private 
 
   def set_deal
@@ -57,6 +48,6 @@ class Admin::DealsController < Admin::BaseController
   end
 
   def deal_params
-    params.require(:deal).permit(:title, :description, :publishable, :quantity, :price_in_cents, :discount_price_in_cents, :publish_date, :published_date, :deals_tax, deal_images_attributes: [:image] )
+    params.require(:deal).permit(:title, :description, :publishable, :quantity, :price_in_cents, :discount_price_in_cents, :publish_at, :published_at, :deals_tax, deal_images_attributes: [:image] )
   end 
 end
