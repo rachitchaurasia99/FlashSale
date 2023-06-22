@@ -30,6 +30,6 @@
 
   <div>
     <strong>Publishable: </strong>
-    <%= deal.assign_attributes(published_at: Time.current); deal.valid? ? "YES" : "NO" %>
+    <%= deal.valid?(:publish) ? "YES" : "NO" %>
   </div>
 </div>
