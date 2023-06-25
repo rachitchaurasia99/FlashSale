@@ -2,20 +2,20 @@ class Deal < ApplicationRecord
   include ActiveModel::Serialization
 
   has_many :deal_images, dependent: :destroy
-  has_many :line_items, dependent: :restrict_with_exception
+  has_many :line_items, dependent: :restrict_with_error
 
   accepts_nested_attributes_for :deal_images, allow_destroy: true, reject_if: proc { |attributes| attributes[:image].blank? }
 
-  validates :title, :description, :price_in_cents, :discount_price_in_cents, :quantity, :deals_tax, :publish_at, presence: true
+  validates :title, :description, :price_in_cents, :discount_price_in_cents, :quantity, :tax_percentage, :publish_at, presence: true
 
   validates :scheduled_deals_count, numericality: { less_than: MAXIMUM_DEALS_TO_SCHEDULE , message: "No more than 2 deals can be published in one day" }, on: :create
 
   validates :discount_price_in_cents, numericality: { less_than_equal_to: :price_in_cents }
 
-  with_options if: :published_at? do
+  with_options on: :publish do
     validates :quantity, numericality: { greater_than: MINIMUM_DEAL_QUANTITY, message: ' should be greater than 10' }
     validates :images_count, numericality: { greater_than_or_equal_to: MINIMUM_DEAL_IMAGE , message: 'should be greater than or equal to 2' }
-    validates :deals_tax, numericality: { in: MINIMUM_TAX_RATE..MAXIMUM_TAX_RATE }, allow_blank: true
+    validates :tax_percentage, numericality: { in: MINIMUM_TAX_RATE..MAXIMUM_TAX_RATE }, allow_blank: true
   end
 
   validate :valid_publish_at, on: :update
@@ -23,8 +23,16 @@ class Deal < ApplicationRecord
   scope :live, ->{ where(publishable: true).where.not(published_at: nil) }
   scope :expired, ->{ where(publishable: false).where.not(published_at: nil) }
   scope :publishable_on, ->(date) { where(publish_at: date) }
-  scope :to_publish, ->{ where(publish_at: Time.current).where(published_at: nil).where(publishable: true) }
-  scope :to_unpublish, ->{ where(publish_at: Time.current).where.not(published_at: nil).where(publishable: true) }
+  scope :to_publish, ->{ where('DATE(publish_at) = ?', Date.current).where(published_at: nil).where(publishable: true) }
+  scope :to_unpublish, ->{ where('DATE(publish_at) = ?', Date.yesterday).where.not(published_at: nil).where(publishable: true) }
+
+  def unit_price
+    price_in_cents * 0.01
+  end
+
+  def discount_price
+    discount_price_in_cents * 0.01
+  end
 
   def serialize
     serializable_hash(only: [:id, :title, :description, :quantity, :price_in_cents, :discount_price_in_cents])
