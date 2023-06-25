@@ -20,16 +20,16 @@
 
   <div>
     <strong>Original Price</strong>
-    <s><%= price_on_deal(deal.price_in_cents) %></s>
+    <s><%= price_on_deal(deal.unit_price) %></s>
   </div>
 
   <div>
     <strong>Deal Price</strong>
-    <%= price_on_deal(deal.discount_price_in_cents) %>
+    <%= price_on_deal(deal.discount_price) %>
   </div>
 
   <div>
     <strong>Publishable: </strong>
-    <%= deal.assign_attributes(published_at: Time.current); deal.valid? ? "YES" : "NO" %>
+    <%= deal.valid?(:publish) ? "YES" : "NO" %>
   </div>
 </div>

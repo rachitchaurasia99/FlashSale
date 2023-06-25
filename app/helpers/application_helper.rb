@@ -9,6 +9,6 @@ module ApplicationHelper
   end
 
   def price_on_deal(price)
-    (price/100).to_fs(:currency, format: '%u %n')
+    price.to_fs(:currency, unit: '₹', format: '%u %n')
   end
 end
