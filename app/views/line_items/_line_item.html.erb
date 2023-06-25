@@ -8,12 +8,12 @@
  
   <div>
     <strong>Original Price</strong>
-    <s><%= price_on_deal(line_item.price_in_cents) %></s>
+    <s><%= price_on_deal(line_item.unit_price) %></s>
   </div>
 
   <div>
     <strong>Deal Price</strong>
-    <%= price_on_deal(line_item.discount_price_in_cents) %>
+    <%= price_on_deal(line_item.discount_price) %>
   </div>
 
   <div>
