@@ -48,6 +48,6 @@ class Admin::DealsController < Admin::BaseController
   end
 
   def deal_params
-    params.require(:deal).permit(:title, :description, :publishable, :quantity, :price_in_cents, :discount_price_in_cents, :publish_at, :published_at, :deals_tax, deal_images_attributes: [:image] )
+    params.require(:deal).permit(:title, :description, :publishable, :quantity, :price_in_cents, :discount_price_in_cents, :publish_at, :published_at, :tax_percentage, deal_images_attributes: [:image] )
   end 
 end

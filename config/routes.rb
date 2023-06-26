@@ -12,9 +12,8 @@ Rails.application.routes.draw do
       delete :soft_delete
     end
   end
-  
-  resources :line_items
-  resources :addresses
+
+  resources :addresses, only: [:new, :create]
 
   resources :orders do
     member do
@@ -25,12 +24,13 @@ Rails.application.routes.draw do
       get 'checkout'
       get 'cart' 
       patch 'checkout'
+      post 'add_to_cart'
+      post 'remove_from_cart'
     end
   end
 
   get 'past_deals', to: 'store#past_deals', as: :past_deals
   
-  resources :address
   resources :payments, only: [:new, :create]
   
   namespace :api do
