@@ -1,7 +1,6 @@
 desc "Generates Token"
 namespace :user do
-  task :generate_token, [:email] => :environment do |t, args|
-    user = User.find_by(email: args[:email])
-    user.regenerate_auth_token
+  task :generate_token  => :environment do |t, args|
+    User.where(auth_token: nil).each(&:generate_auth_token)
   end
 end

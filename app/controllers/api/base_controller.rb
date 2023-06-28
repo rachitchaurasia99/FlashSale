@@ -3,7 +3,7 @@ class Api::BaseController < ApplicationController
 
   private 
 
-  def find_user_by_auth_token
+  def current_api_user
     @user = User.find_by(auth_token: params[:token])
     render json: { error: 'Token Malformed' }, status: 403 unless @user
   end
