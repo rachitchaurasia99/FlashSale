@@ -1,6 +1,4 @@
 class Deal < ApplicationRecord
-  include ActiveModel::Serialization
-
   has_many :deal_images, dependent: :destroy
   has_many :line_items, dependent: :restrict_with_error
   has_many :orders, through: :line_items
@@ -44,10 +42,6 @@ class Deal < ApplicationRecord
 
   def discount_price
     discount_price_in_cents * 0.01
-  end
-
-  def serialize
-    serializable_hash(only: [:id, :title, :description, :quantity, :price_in_cents, :discount_price_in_cents])
   end
 
   def self.deal_revenue

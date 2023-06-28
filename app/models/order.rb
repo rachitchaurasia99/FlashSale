@@ -1,6 +1,4 @@
 class Order < ApplicationRecord
-  include ActiveModel::Serialization
-
   enum :status, { InProgress: 0, Placed: 1, Delivered: 2, Cancelled: 3}
   
   belongs_to :user
@@ -64,9 +62,5 @@ class Order < ApplicationRecord
     else
       0
     end
-  end
-    
-  def serialize
-    serializable_hash(only: [:id, :deal_id, :address_id, :status])
   end
 end

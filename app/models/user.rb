@@ -11,6 +11,8 @@ class User < ApplicationRecord
 
   validates :first_name, presence: true
 
+  after_create :generate_auth_token
+  
   scope :customers_orders, ->(from, to){ includes(:orders).includes(:payments).where('DATE(order_at) BETWEEN ? AND ?', from, to).where(orders: { status: 'Delivered' }).where(payments: { status: 'Successful' }) }
   scope :orders_by_email, ->{ includes(:orders).where(status: 'Delivered')}
   
@@ -18,5 +20,9 @@ class User < ApplicationRecord
     customers_order_amount = {}
     customers_orders(from, to).map { |customer| customers_order_amount.store(customer, customer.payments.sum(&:total_amount)) }
     customers_order_amount.sort_by { |customer, amount| -amount }
+  end
+
+  def generate_auth_token
+    regenerate_auth_token
   end
 end
