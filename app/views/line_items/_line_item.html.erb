@@ -1,9 +1,9 @@
 <div id="<%= dom_id line_item %>">
-  <u><%= link_to "#{Deal.find(line_item.deal_id).title}" %></u>
+  <u><%= link_to "#{line_item.deal.title}" %></u>
   </br>
 
   <div>
-    <%= render 'deals/image', deal: Deal.find(line_item.deal_id)%>
+    <%= render 'deals/image', deal: line_item.deal%>
   <div>
  
   <div>

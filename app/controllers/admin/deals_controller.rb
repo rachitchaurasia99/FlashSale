@@ -2,7 +2,7 @@ class Admin::DealsController < Admin::BaseController
   before_action :set_deal, only: %i[show edit update destroy check_publishablity]
   
   def index
-    @deals = Deal.all
+    @deals = Deal.all_deals
   end
 
   def new
@@ -43,7 +43,7 @@ class Admin::DealsController < Admin::BaseController
   private 
 
   def set_deal
-    @deal = Deal.find_by(id: params[:id])
+    @deal = Deal.where(id: params[:id]).includes(deal_images: { image_attachment: :blob } )
     redirect_to admin_deals_path, notice: "Deal Not found" unless @deal
   end
 

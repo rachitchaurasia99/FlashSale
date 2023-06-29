@@ -5,7 +5,7 @@ class OrdersController < ApplicationController
 
   def index
     @orders = Order.placed_orders
-    @orders = current_user.orders.not_InProgress if params[:user_id]
+    @orders = current_user.orders.includes(:address).not_InProgress if params[:user_id]
   end
 
   def new
@@ -41,7 +41,7 @@ class OrdersController < ApplicationController
   end
 
   def cart
-    @order = Order.includes(:line_items).where(id: current_order.id).first
+    @order = Order.eager_load(deals: { deal_images: { image_attachment: :blob } } ).where(id: current_order.id).first
     if @order.line_items.empty?
       redirect_to root_path, alert: "You have no deals selected"
     end
@@ -135,7 +135,7 @@ class OrdersController < ApplicationController
   private 
 
   def set_order
-    @order = Order.find_by(id: params[:id])
+    @order = Order.includes(line_items: { deal: { deal_images: { image_attachment: :blob } } }).where(id: params[:id]).first
     redirect_to root_path, alert: "Order Not found" unless @order
   end
 

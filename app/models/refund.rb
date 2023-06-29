@@ -3,5 +3,5 @@ class Refund < ApplicationRecord
 
   belongs_to :order
   
-  scope :successful, ->{ where(status: 'Successful').first }
+  scope :successful, ->{ Successful.first }
 end

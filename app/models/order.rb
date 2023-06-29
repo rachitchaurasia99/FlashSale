@@ -11,7 +11,7 @@ class Order < ApplicationRecord
   has_many :deals, through: :line_items
   
   scope :placed_orders, ->{ includes(:address, :payments).where(orders: { status: 'Placed' }).where(payments: { status: 'Successful' }) }
-  scope :deal_exists, ->(deal_id){ includes(:deals).where(deals: { id: deal_id }) }
+  scope :deal_exists, ->(deal_id){ joins(:deals).where(deals: { id: deal_id }) }
   
   def add_to_cart(line_item)
     self.total_in_cents += line_item.price_in_cents

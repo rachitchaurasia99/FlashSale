@@ -3,7 +3,7 @@ class Payment < ApplicationRecord
 
   belongs_to :order
   
-  scope :successful, ->{ where(status: :Successful).first }
+  scope :successful, ->{ Successful.first }
 
   def total_amount
     total_amount_in_cents * 0.01

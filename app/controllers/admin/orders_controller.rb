@@ -6,7 +6,7 @@ class Admin::OrdersController < Admin::BaseController
       @orders = User.find_by(email: params[:email]).orders.not_InProgress
       flash[:notice] = 'No orders found' if @orders.empty?
     else
-      @orders = Order.not_InProgress
+      @orders = Order.includes(:address).not_InProgress
     end
   end
 
