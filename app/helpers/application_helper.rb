@@ -8,7 +8,7 @@ module ApplicationHelper
     link_to(name, '#', class: "add_fields", data: {id: id, fields: fields.gsub("\n", "")})
   end
 
-  def price_on_deal(price)
+  def price_in_currency(price)
     price.to_fs(:currency, unit: '₹', format: '%u %n')
   end
 end
