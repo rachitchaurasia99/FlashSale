@@ -26,9 +26,10 @@ class Deal < ApplicationRecord
   scope :publishable_on, ->(date) { where(publish_at: date) }
   scope :to_publish, ->{ where('DATE(publish_at) = ?', Date.current).where(published_at: nil).where(publishable: true) }
   scope :to_unpublish, ->{ where('DATE(publish_at) = ?', Date.yesterday).where.not(published_at: nil).where(publishable: true) }
-  scope :delivered_orders, ->{ includes(:orders).where(orders: {status: 'Delivered'})}
+  scope :delivered_orders, ->{ includes(:orders).where(orders: {status: 'delivered'})}
 
-  def unit_price
+
+  def price
     price_in_cents * 0.01
   end
 

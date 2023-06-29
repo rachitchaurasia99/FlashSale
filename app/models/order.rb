@@ -1,5 +1,5 @@
 class Order < ApplicationRecord
-  enum :status, { InProgress: 0, Placed: 1, Delivered: 2, Cancelled: 3}
+  enum :status, { in_progress: 0, placed: 1, delivered: 2, cancelled: 3 }
   
   belongs_to :user
   belongs_to :address, optional: true
@@ -8,7 +8,7 @@ class Order < ApplicationRecord
   has_many :line_items, dependent: :destroy, after_add: :add_to_cart, after_remove: :remove_from_cart
   has_many :deals, through: :line_items
   
-  scope :placed_orders, ->{ includes(:address, :payments).where(orders: { status: 'Placed' }).where(payments: { status: 'Successful' }) }
+  scope :placed_orders, ->{ includes(:address, :payments).where(status: 'placed').where(payments: { status: 'successful' }) }
   scope :deal_exists, ->(deal_id){ includes(:deals).where(deals: { id: deal_id }) }
   
   def add_to_cart(line_item)

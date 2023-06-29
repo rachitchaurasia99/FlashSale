@@ -5,7 +5,7 @@ class OrdersController < ApplicationController
 
   def index
     @orders = Order.placed_orders
-    @orders = current_user.orders.not_InProgress if params[:user_id]
+    @orders = current_user.orders.not_in_progress if params[:user_id]
   end
 
   def new
@@ -97,20 +97,20 @@ class OrdersController < ApplicationController
 
   def payment
     stripe_session = StripeHandler.new(success_order_url, cancel_order_url, @order).create_stripe_session
-    @order.payments.create(session_id: stripe_session.id, currency: stripe_session.currency, status: 'Pending', total_amount_in_cents: @order.net_in_cents)
+    @order.payments.create(session_id: stripe_session.id, currency: stripe_session.currency, status: 'pending', total_amount_in_cents: @order.net_in_cents)
     redirect_to stripe_session.url, allow_other_host: true
   end
 
   def success
     checkout_session = Stripe::Checkout::Session.retrieve(@order.payments.last.session_id)
-    @order.update_columns({ status: 'Placed', order_at: Time.current })
-    @order.payments.last.update_columns({ status: 'Successful', payment_intent: checkout_session.payment_intent })
-    OrderMailer.with(order: current_user.orders.Placed.last).received.deliver_later
+    @order.update_columns({ status: 'placed', order_at: Time.current })
+    @order.payments.last.update_columns({ status: 'successful', payment_intent: checkout_session.payment_intent })
+    OrderMailer.with(order: current_user.orders.placed.last).received.deliver_later
     
   end
 
   def cancel
-    @order.payments.last.Failed!
+    @order.payments.last.failed!
     redirect_to checkout_order_path, alert: 'Payment was cancelled'
   end
 
