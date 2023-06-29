@@ -24,14 +24,15 @@ class Deal < ApplicationRecord
   scope :to_publish, ->{ where('DATE(publish_at) = ?', Date.current).where(published_at: nil).where(publishable: true) }
   scope :to_unpublish, ->{ where('DATE(publish_at) = ?', Date.yesterday).where.not(published_at: nil).where(publishable: true) }
 
-  def unit_price
+
+  def price
     price_in_cents * 0.01
   end
 
   def discount_price
     discount_price_in_cents * 0.01
   end
-
+  
   private
   
   def images_count
