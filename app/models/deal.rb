@@ -20,6 +20,15 @@ class Deal < ApplicationRecord
   scope :expired, ->{ where(publishable: false).where.not(published_at: nil) }
   scope :publishable_on, ->(date) { where(publish_at: date) }
 
+
+  def price
+    price_in_cents * 0.01
+  end
+
+  def discount_price
+    discount_price_in_cents * 0.01
+  end
+  
   private
   
   def images_count
