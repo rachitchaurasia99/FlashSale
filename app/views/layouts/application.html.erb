@@ -1,4 +1,3 @@
-<%= javascript_include_tag 'add_field' %>
 <%= javascript_include_tag 'dropdown' %>
 <!DOCTYPE html>
 <html>
@@ -18,7 +17,7 @@
     <nav class="navbar navbar-light bg-light">
       <%= link_to 'HomePage', root_path%>
       <% if user_signed_in? %>
-        <% if current_user.Admin? %>
+        <% if current_user.admin? %>
           <%= render 'users/shared/dropdown' %>
         <% end %>
         <%= link_to 'Profile', profile_path %>

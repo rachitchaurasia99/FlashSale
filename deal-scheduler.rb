@@ -1,9 +1,9 @@
 require 'sidekiq-scheduler'
 
-class PublishDeal
+class PublishingDeals
   include Sidekiq::Worker
 
   def perform
-    system('rake publish_deal')
+    system('rake publishing_deals')
   end
 end

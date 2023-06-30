@@ -1,9 +1,11 @@
 class OrdersController < ApplicationController
-  before_action :set_order, only: %i[show edit update destroy payment success cancel cancel_order]
-  
+  before_action :set_order, only: %i[show edit update destroy payment success cancel]
+  before_action :set_line_item, only: [:remove_from_cart]
+  before_action :set_deal, only: [:add_to_cart]
+
   def index
     @orders = Order.placed_orders
-    @orders = Order.users_placed_orders(params[:user_id]) if params[:user_id]
+    @orders = current_user.orders.not_in_progress if params[:user_id]
   end
 
   def new
@@ -23,7 +25,6 @@ class OrdersController < ApplicationController
   end
 
   def update
-    @order.build_address
     if @order.update(order_params)
       payment
     else
@@ -40,64 +41,95 @@ class OrdersController < ApplicationController
   end
 
   def cart
-    @order = current_order
+    @order = Order.includes(:line_items).where(id: current_order.id).first
     if @order.line_items.empty?
       redirect_to root_path, alert: "You have no deals selected"
     end
   end
 
+  def add_to_cart
+    if current_user.orders.deal_exists(@deal.id).any?
+      redirect_to root_path, alert: 'You can only buy one quantity of this deal'
+    else
+      @line_item = current_order.line_items.create(
+        deal_id: @deal.id,
+        quantity: 1,
+        discount_price_in_cents: @deal.discount_price_in_cents,
+        price_in_cents: @deal.price_in_cents
+      )
+      @deal.decrement!(:quantity, 1)
+      if @deal.quantity.zero?
+        ActionCable.server.broadcast(
+          "deal_status_channel",
+           {
+             deal_id: @deal.id,
+             quantity: @deal.quantity
+           }
+          )
+      end
+      redirect_to root_path, notice: 'Item Added'
+    end
+  end
+
+  def remove_from_cart
+    @deal = Deal.find(@line_item.deal.id)
+    quantity = @deal.quantity
+    if current_order.line_items.destroy(@line_item)
+      @deal.increment!(:quantity, 1)
+      if quantity.zero?
+        ActionCable.server.broadcast(
+          "deal_status_channel",
+           {
+             deal_id: @deal.id,
+             quantity: @deal.quantity
+           }
+        )
+      end
+      redirect_to request.referer
+    else
+      render :new, status: :unprocessable_entity 
+    end
+  end
+
   def checkout
     @order = current_order
-    @order.build_address
   end
 
   def payment
-    deal = @order.line_items.map do |line_item|
-      { quantity: 1,
-        price_data: {
-          currency: 'inr',
-          unit_amount: line_item.unit_price.to_i,
-          product_data: { 
-            name: line_item.deal.title 
-          }
-        }
-      }
-    end
-
-    session = Stripe::Checkout::Session.create( 
-      line_items: deal,
-      mode: 'payment',
-      success_url:  success_order_url,
-      cancel_url: cancel_order_url
-    )
-    @order.payments.create(session_id: session.id, currency: session.currency, status: 'Pending', total_amount_in_cents: @order.order_total)
-    redirect_to session.url, allow_other_host: true
+    stripe_session = StripeHandler.new(success_order_url, cancel_order_url, @order).create_stripe_session
+    @order.payments.create(session_id: stripe_session.id, currency: stripe_session.currency, status: 'pending', total_amount_in_cents: @order.net_in_cents)
+    redirect_to stripe_session.url, allow_other_host: true
   end
 
   def success
     checkout_session = Stripe::Checkout::Session.retrieve(@order.payments.last.session_id)
-    @order.update_columns({ status: 'Placed', order_date: Date.current })
-    @order.payments.last.update_columns({ status: 'Successful', payment_intent: checkout_session.payment_intent })
-    OrderMailer.with(order: @order).received.deliver_later
+    @order.update_columns({ status: 'placed', order_at: Time.current })
+    @order.payments.last.update_columns({ status: 'successful', payment_intent: checkout_session.payment_intent })
+    OrderMailer.with(order: current_user.orders.placed.last).received.deliver_later
+    
   end
 
   def cancel
-    @order.payments.last.update_column(status: 'Failed')
+    @order.payments.last.failed!
+    redirect_to checkout_order_path, alert: 'Payment was cancelled'
   end
 
   def cancel_order
-    if @order.deals.any? { |deal| deal.expiring_soon? }
+    if Deal.expiring_soon(@order)
       flash[:notice] = "Order can't be cancelled 30 minutes before the deal ends"
     else
-      payment_intent = Stripe::PaymentIntent.retrieve(@order.payments.successful.payment_intent)
-      refund = Stripe::Refund.create({
-        payment_intent: payment_intent
-      })
-      @order.refunds.create(refund_id: refund.id, status: 'Successful', currency: 'inr', total_amount_in_cents: refund.amount)
-      @order.update_column(:status, 'Cancelled')
-      OrderMailer.with(order: @order, refund_id: refund.id).cancelled.deliver_later
-      @order.line_items.each do |line_item|
-        line_item.deal.increment!(:quantity)
+      refund_session = StripeRefundHandler.new(@order)
+      refund = refund_session.create_refund
+      unless refund.messages[:alert]
+        @order.refunds.create(refund_id: refund.id, status: 'successful', currency: 'inr', total_amount_in_cents: refund.amount)
+        @order.cancelled!
+        OrderMailer.with(order: @order, refund_id: refund.id).cancelled.deliver_later
+        @order.line_items.each do |line_item|
+          line_item.deal.increment!(:quantity)
+        end
+        flash[:notice] = refund.messages[:notice]
+      else
+        flash[:notice] = refund.messages[:alert]
       end
     end
     redirect_to request.referer
@@ -111,6 +143,14 @@ class OrdersController < ApplicationController
   end
 
   def order_params
-    params.require(:order).permit( :status , :address_id, address_attributes: [:name, :email, :user_id, :city, :state, :country, :pincode] )
+    params.require(:order).permit( :status , :address_id )
   end 
+
+  def set_deal
+    @deal = Deal.find(params[:id])
+  end
+
+  def set_line_item
+    @line_item = LineItem.find(params[:id])
+  end
 end

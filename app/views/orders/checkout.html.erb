@@ -1,18 +1,8 @@
 <h3><u>Shipping Details</u></h3>
 </br>
 <%= form_with model: @order do |form| %>
-  <% if @order.errors.any? %>
-    <div style="color: red">
-      <h2><%= pluralize(@order.errors.count, "error") %> prohibited this order from being placed:</h2>
-
-      <ul>
-        <% @order.errors.each do |error| %>
-          <li><%= error.full_message %></li>
-        <% end %>
-      </ul>
-    </div>
-  <% end %>
-
+  <%= render 'shared/errors', object: @order %>
+  
   <% if current_user.addresses.any? %>
     <div class="btn-group-vertical" data-toggle="buttons">
       <%= form.collection_radio_buttons :address_id, current_user.addresses, :id, :name, checked: current_user.addresses.last.id do |address| %>
@@ -27,10 +17,9 @@
   <% end %>
 
   <div>
-    <%= link_to_add_fields "Add New Address", form, :address %>
-  </div>
-
-  <div>
     <%= form.submit 'Checkout', data: { turbo: false } %>
   </div>
 <% end %>
+</br>
+
+<%= link_to 'Add new Address', new_address_path %>

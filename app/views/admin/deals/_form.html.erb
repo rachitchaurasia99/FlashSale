@@ -1,15 +1,6 @@
+<%= javascript_include_tag 'add_field' %>
 <%= form_with(model: [:admin, deal]) do |form| %>
-  <% if deal.errors.any? %>
-    <div style="color: red">
-      <h2><%= pluralize(deal.errors.count, "error") %> prohibited this deal from being saved:</h2>
-
-      <ul>
-        <% deal.errors.each do |error| %>
-          <li><%= error.full_message %></li>
-        <% end %>
-      </ul>
-    </div>
-  <% end %>
+  <%= render 'shared/errors', object:deal %>
 
   <div>
     <%= form.label :publishable %>
@@ -46,13 +37,13 @@
   </div>
 
   <div>
-    <%= form.label :deals_tax %>
-    <%= form.text_field :deals_tax %>
+    <%= form.label :tax_percentage %>
+    <%= form.text_field :tax_percentage %>
   </div>
 
   <div>
-    <%= form.label :publish_date %>
-    <%= form.datetime_field :publish_date %>
+    <%= form.label :publish_at %>
+    <%= form.datetime_field :publish_at %>
   </div>
 
   </br>

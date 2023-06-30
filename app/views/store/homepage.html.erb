@@ -1,9 +1,8 @@
 <h1>Welcome
-<% if user_signed_in? %>
-  <%= current_user.first_name %> </h1>
-<% else %>
-  </h1>
-<% end %>
+  <% if user_signed_in? %>
+    <%= current_user.first_name %>
+  <% end %>
+</h1>
 </br>
 <%= link_to 'View Previous Deals', past_deals_path %>
 </br>
@@ -12,7 +11,7 @@
   <% if deal.quantity.zero? %>
     <button disabled>Sold Out</button>
   <% else %>
-    <%= button_to 'Buy', line_items_path(deal_id: deal), id: "deal_button_#{deal.id}" %>
+    <%= button_to 'Buy', add_to_cart_order_path(deal), id: "deal_button_#{deal.id}" %>
   <% end %>
   </br>
 <% end %>

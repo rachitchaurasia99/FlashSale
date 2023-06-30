@@ -13,11 +13,11 @@
 
   <div>
     <strong>Original Price</strong>
-    <s><%= price_in_decimal(deal.price_in_cents).to_fs(:currency, unit: '₹', format: '%u %n') %></s>
+    <s><%= price_in_currency(deal.price) %></s>
   </div>
 
   <div>
     <strong>Deal Price</strong>
-    <%= price_in_decimal(deal.discount_price_in_cents).to_fs(:currency, unit: '₹', format: '%u %n') %>
+    <%= price_in_currency(deal.discount_price) %>
   </div>
 </div>

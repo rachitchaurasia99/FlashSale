@@ -1,17 +1,12 @@
-document.addEventListener('DOMContentLoaded', function() {
-  var dropdownToggle = document.querySelector('.dropdown-toggle');
+document.addEventListener('click', function(e) {
+  var dropdownToggles = document.querySelectorAll('.dropdown-toggle');
   var dropdownMenu = document.querySelector('.dropdown-menu');
-
-  dropdownToggle.addEventListener('click', function() {
-    dropdownMenu.style.display = (dropdownMenu.style.display === 'block') ? 'none' : 'block';
-  });
-
-  document.addEventListener('click', function(e) {
-    var target = e.target;
-    var isDropdownToggle = target.classList.contains('dropdown-toggle') || target.closest('.dropdown-toggle');
-
-    if (!isDropdownToggle) {
-      dropdownMenu.style.display = 'none';
-    }
-  });
+  var dropdownToggle = e.target.closest('.dropdown-toggle');
+  if (!dropdownToggle) {
+    dropdownMenu.classList.remove('show');
+    return;
+  }
+  for (var i = 0; i < dropdownToggles.length; i++) {
+      dropdownMenu.classList.toggle('show');
+  }
 });
