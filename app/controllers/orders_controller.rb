@@ -85,7 +85,7 @@ class OrdersController < ApplicationController
            }
         )
       end
-      redirect_to request.referer
+      redirect_back fallback_location: root_path
     else
       render :new, status: :unprocessable_entity 
     end
@@ -102,11 +102,12 @@ class OrdersController < ApplicationController
   end
 
   def success
-    checkout_session = Stripe::Checkout::Session.retrieve(@order.payments.last.session_id)
-    @order.update_columns({ status: 'placed', order_at: Time.current })
-    @order.payments.last.update_columns({ status: 'successful', payment_intent: checkout_session.payment_intent })
+    checkout_session = StripeHandler.retrieve_session(@order)
+    ActiveRecord::Base.transaction do
+      @order.update_columns({ status: 'placed', order_at: Time.current })
+      @order.payments.last.update_columns({ status: 'successful', payment_intent: checkout_session.payment_intent })
+    end
     OrderMailer.with(order: current_user.orders.placed.last).received.deliver_later
-    
   end
 
   def cancel
