@@ -1,5 +1,5 @@
 class Admin::UsersController < Admin::BaseController
-  before_action :set_user, only: %i[show edit update destroy]
+  before_action :set_user, only: %i[show edit update destroy soft_delete]
   
   def index
     @users = User.all
@@ -15,7 +15,7 @@ class Admin::UsersController < Admin::BaseController
     if @user.update(user_params)
       redirect_to admin_users_path, notice: "User #{@user.email} was successfully updated."
     else
-      render :new, status: :unprocessable_entity 
+      render :edit, status: :unprocessable_entity 
     end
   end
 
@@ -28,9 +28,8 @@ class Admin::UsersController < Admin::BaseController
   end
 
   def soft_delete
-    @user = User.find(params[:id])
-    @user.soft_delete
-    redirect_to root_path, notice: 'User soft deleted.'
+    @user.discard!
+    redirect_to admin_users_path, notice: 'User soft deleted.'
   end
 
   private 

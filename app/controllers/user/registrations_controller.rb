@@ -19,9 +19,6 @@ class User::RegistrationsController < Devise::RegistrationsController
   #   super
   # end
 
-  def profile
-  end
-
   # PUT /resource
   # def update
   #   super

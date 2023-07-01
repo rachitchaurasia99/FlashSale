@@ -5,7 +5,7 @@ class OrdersController < ApplicationController
 
   def index
     @orders = Order.placed_orders
-    @orders = current_user.orders.includes(:address).not_InProgress if params[:user_id]
+    @orders = current_user.orders.includes(:address).not_in_progress if params[:user_id]
   end
 
   def new
@@ -85,7 +85,7 @@ class OrdersController < ApplicationController
            }
         )
       end
-      redirect_to request.referer
+      redirect_back fallback_location: root_path
     else
       render :new, status: :unprocessable_entity 
     end
@@ -97,39 +97,41 @@ class OrdersController < ApplicationController
 
   def payment
     stripe_session = StripeHandler.new(success_order_url, cancel_order_url, @order).create_stripe_session
-    @order.payments.create(session_id: stripe_session.id, currency: stripe_session.currency, status: 'Pending', total_amount_in_cents: @order.net_in_cents)
+    @order.payments.create(session_id: stripe_session.id, currency: stripe_session.currency, status: 'pending', total_amount_in_cents: @order.net_in_cents)
     redirect_to stripe_session.url, allow_other_host: true
   end
 
   def success
-    checkout_session = Stripe::Checkout::Session.retrieve(@order.payments.last.session_id)
-    @order.update_columns({ status: 'Placed', order_at: Time.current })
-    @order.payments.last.update_columns({ status: 'Successful', payment_intent: checkout_session.payment_intent })
-    OrderMailer.with(order: current_user.orders.Placed.last).received.deliver_later
-    
+    checkout_session = StripeHandler.retrieve_session(@order)
+    ActiveRecord::Base.transaction do
+      @order.update_columns({ status: 'placed', order_at: Time.current })
+      @order.payments.last.update_columns({ status: 'successful', payment_intent: checkout_session.payment_intent })
+    end
+    OrderMailer.with(order: current_user.orders.placed.last).received.deliver_later
   end
 
   def cancel
-    @order.payments.last.Failed!
+    @order.payments.last.failed!
     redirect_to checkout_order_path, alert: 'Payment was cancelled'
   end
 
   def cancel_order
-    if @order.deals.any? { |deal| deal.expiring_soon? }
+    if Deal.expiring_soon(@order)
       flash[:notice] = "Order can't be cancelled 30 minutes before the deal ends"
     else
-      payment_intent = Stripe::PaymentIntent.retrieve(@order.payments.successful.payment_intent)
-      refund = Stripe::Refund.create({
-        payment_intent: payment_intent
-      })
-      @order.refunds.create(refund_id: refund.id, status: 'Successful', currency: 'inr', total_amount_in_cents: refund.amount)
-      @order.update_column(:status, 'Cancelled')
-      OrderMailer.with(order: @order, refund_id: refund.id).cancelled.deliver_later
-      @order.line_items.each do |line_item|
-        line_item.deal.increment!(:quantity)
+      refund_session = StripeRefundHandler.new(@order)
+      refund = refund_session.create_refund
+      unless refund.messages[:alert]
+        @order.cancel_order(refund)
+        @order.line_items.each do |line_item|
+          line_item.deal.increment!(:quantity)
+        end
+        flash[:notice] = refund.messages[:notice]
+      else
+        flash[:notice] = refund.messages[:alert]
       end
     end
-    redirect_to request.referer
+    redirect_back fallback_location: order_path(@order)
   end
 
   private 
