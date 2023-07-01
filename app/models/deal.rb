@@ -19,14 +19,12 @@ class Deal < ApplicationRecord
 
   validate :valid_publish_at, on: :update
 
-  after_save :calculate_tax_on_deal
-
   scope :live, ->{ where(publishable: true).where.not(published_at: nil) }
   scope :expired, ->{ where(publishable: false).where.not(published_at: nil) }
   scope :publishable_on, ->(date) { where(publish_at: date) }
   scope :to_publish, ->{ where('DATE(publish_at) = ?', Date.current).where(published_at: nil).where(publishable: true) }
   scope :to_unpublish, ->{ where('DATE(publish_at) = ?', Date.yesterday).where.not(published_at: nil).where(publishable: true) }
-  scope :delivered_orders, ->{ includes(:orders).where(orders: {status: 'delivered'})}
+  scope :deals_with_revenue, ->{ joins(:orders).where(orders: {status: 'delivered'}).group(:id).select('deals.*, COUNT(orders.id) as orders_count') }
   scope :expiring_soon, ->(order){ joins(:orders).where(orders: { id: order } ).where('published_at < ?', Time.current - LIVE_DEAL_DURATION - MINIMUM_TIME_TO_CANCEL_ORDER) }
 
   def price
@@ -45,12 +43,6 @@ class Deal < ApplicationRecord
     discount_price_in_cents * 0.01
   end
 
-  def self.deal_revenue
-    deals_with_revenue = {}
-    delivered_orders.map{ |deal| deals_with_revenue.store(deal, deal.orders.length * deal.deal_price_with_tax) }
-    deals_with_revenue
-  end
-
   def deal_price_with_tax
     discount_price + tax_on_deal
   end
@@ -60,7 +52,7 @@ class Deal < ApplicationRecord
   end
 
   def calculate_tax_on_deal
-    update_column(:tax_in_cents, discount_price * tax_percentage)
+    self.tax_in_cents = discount_price * tax_percentage
   end
   
   private

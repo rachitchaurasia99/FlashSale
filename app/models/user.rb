@@ -13,14 +13,8 @@ class User < ApplicationRecord
 
   after_create :generate_auth_token
   
-  scope :customers_orders, ->(from, to){ includes(:orders).includes(:payments).where('DATE(order_at) BETWEEN ? AND ?', from, to).where(orders: { status: 'delivered' }).where(payments: { status: 'successful' }) }
-  scope :orders_by_email, ->{ includes(:orders).where(status: 'delivered')}
-  
-  def self.top_spending_customers(from, to)
-    customers_order_amount = {}
-    customers_orders(from, to).map { |customer| customers_order_amount.store(customer, customer.payments.sum(&:total_amount)) }
-    customers_order_amount.sort_by { |customer, amount| -amount }
-  end
+  scope :customers_orders, ->(from = Date.current, to = Date.current){ joins(:orders).where('DATE(order_at) BETWEEN ? AND ?', from, to).where(orders: { status: 'delivered' }).group(:id).reselect('users.*, SUM(orders.net_in_cents) as total_amount') }
+  scope :orders_by_email, ->{ includes(:orders).where(status: 'delivered') }
 
   def generate_auth_token
     regenerate_auth_token

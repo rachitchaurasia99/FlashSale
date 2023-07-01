@@ -1,5 +1,5 @@
 class OrdersController < ApplicationController
-  before_action :set_order, only: %i[show edit update destroy payment success cancel]
+  before_action :set_order, only: %i[show edit update destroy payment success cancel cancel_order]
   before_action :set_line_item, only: [:remove_from_cart]
   before_action :set_deal, only: [:add_to_cart]
 
@@ -85,7 +85,7 @@ class OrdersController < ApplicationController
            }
         )
       end
-      redirect_to request.referer
+      redirect_back fallback_location: root_path
     else
       render :new, status: :unprocessable_entity 
     end
@@ -102,11 +102,12 @@ class OrdersController < ApplicationController
   end
 
   def success
-    checkout_session = Stripe::Checkout::Session.retrieve(@order.payments.last.session_id)
-    @order.update_columns({ status: 'placed', order_at: Time.current })
-    @order.payments.last.update_columns({ status: 'successful', payment_intent: checkout_session.payment_intent })
+    checkout_session = StripeHandler.retrieve_session(@order)
+    ActiveRecord::Base.transaction do
+      @order.update_columns({ status: 'placed', order_at: Time.current })
+      @order.payments.last.update_columns({ status: 'successful', payment_intent: checkout_session.payment_intent })
+    end
     OrderMailer.with(order: current_user.orders.placed.last).received.deliver_later
-    
   end
 
   def cancel
@@ -121,9 +122,7 @@ class OrdersController < ApplicationController
       refund_session = StripeRefundHandler.new(@order)
       refund = refund_session.create_refund
       unless refund.messages[:alert]
-        @order.refunds.create(refund_id: refund.id, status: 'successful', currency: 'inr', total_amount_in_cents: refund.amount)
-        @order.cancelled!
-        OrderMailer.with(order: @order, refund_id: refund.id).cancelled.deliver_later
+        @order.cancel_order(refund)
         @order.line_items.each do |line_item|
           line_item.deal.increment!(:quantity)
         end
@@ -132,7 +131,7 @@ class OrdersController < ApplicationController
         flash[:notice] = refund.messages[:alert]
       end
     end
-    redirect_to request.referer
+    redirect_back fallback_location: order_path(@order)
   end
 
   private 

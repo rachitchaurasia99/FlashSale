@@ -8,8 +8,9 @@ class StripeRefundHandler
 
   def create_refund
     begin
-      Stripe::Refund.create({ payment_intent: get_payment_intent })
+      refund = Stripe::Refund.create({ payment_intent: get_payment_intent })
       messages[:notice] = "Refund successful! Refund ID: #{refund.id}"
+      refund
     rescue Stripe::StripeError => e
       messages[:alert] = "Stripe Error: #{e.message}"
     rescue => e

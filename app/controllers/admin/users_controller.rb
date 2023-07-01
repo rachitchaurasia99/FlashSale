@@ -15,7 +15,7 @@ class Admin::UsersController < Admin::BaseController
     if @user.update(user_params)
       redirect_to admin_users_path, notice: "User #{@user.email} was successfully updated."
     else
-      render :new, status: :unprocessable_entity 
+      render :edit, status: :unprocessable_entity 
     end
   end
 
@@ -31,7 +31,7 @@ class Admin::UsersController < Admin::BaseController
 
   def set_user
     @user = User.find_by(id: params[:id])
-    redirect_to admin_users_path, notice: "Use Not found" unless @user
+    redirect_to admin_users_path, notice: "User Not found" unless @user
   end
 
   def user_params

@@ -11,8 +11,8 @@ Deals Revenue
       </tr>
     </thead>
     <tbody>
-      <% @deals.each_pair do |deal, total_deal_revenue| %>
-        <tr><%= render 'deal', deal: deal, total_deal_revenue: total_deal_revenue %></tr>
+      <% @deals.each do |deal| %>
+        <tr><%= render 'deal', deal: deal %></tr>
       <% end %>
     </tbody>
   </table>

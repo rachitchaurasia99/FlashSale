@@ -44,10 +44,13 @@ Rails.application.routes.draw do
 
   namespace :admin do
     controller :reports do
-      get 'reports' => :index
-      get 'reports/deals' => :deals
-      get 'reports/customers' => :customers
+      scope 'reports', as: 'reports' do
+        get '/' => :index
+        get 'deals' => :deals
+        get 'customers' => :customers
+      end
     end
+
     resources :users
     resources :orders do
       member do
