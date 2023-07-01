@@ -3,14 +3,15 @@ class Admin::ReportsController < Admin::BaseController
   end
 
   def deals
-    @deals = Deal.deal_revenue
+    @deals = Deal.deals_with_revenue
     flash[:notice] = 'No customers found' if @deals.empty?
   end
 
   def customers
-    if params[:from] && params[:to]
-      @customers = User.top_spending_customers(params[:from], params[:to])
-      flash[:notice] = 'No customers found' if @customers.empty?
+    if params[:from].present? && params[:to].present?
+      @customers = User.customers_orders(params[:from]&.to_datetime, params[:to].to_datetime)
+    else
+      @customers = User.customers_orders
     end
   end
 end

@@ -1,4 +1,6 @@
 class User < ApplicationRecord
+  include Discard::Model
+  
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable, :confirmable
 
@@ -11,13 +13,13 @@ class User < ApplicationRecord
 
   validates :first_name, presence: true
 
-  scope :customers_orders, ->(from, to){ includes(:orders).includes(:payments).where('DATE(order_at) BETWEEN ? AND ?', from, to).where(orders: { status: 'Delivered' }).where(payments: { status: 'Successful' }) }
-  scope :orders_by_email, ->{ includes(:orders).where(status: 'Delivered')}
+  after_create :generate_auth_token
   
-  def self.top_spending_customers(from, to)
-    customers_order_amount = {}
-    customers_orders(from, to).map { |customer| customers_order_amount.store(customer, customer.payments.sum(&:total_amount)) }
-    customers_order_amount.sort_by { |customer, amount| -amount }
+  scope :customers_orders, ->(from = Date.current, to = Date.current){ joins(:orders).where('DATE(order_at) BETWEEN ? AND ?', from, to).where(orders: { status: 'delivered' }).group(:id).reselect('users.*, SUM(orders.net_in_cents) as total_amount') }
+  scope :orders_by_email, ->{ includes(:orders).where(status: 'delivered') }
+
+  def generate_auth_token
+    regenerate_auth_token
   end
 
   def soft_delete

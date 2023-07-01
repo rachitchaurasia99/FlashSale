@@ -12,7 +12,7 @@ class LineItem < ApplicationRecord
     self.net_in_cents = total_discount_price_in_cents + tax_in_cents
   end
 
-  def unit_price
+  def price
     price_in_cents * 0.01
   end
 

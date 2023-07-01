@@ -2,4 +2,4 @@
   <%= render line_item %>
 <% end %>
 
-<%= button_to 'Cancel Order', cancel_order_path, data: { turbo_confirm: 'Are you sure you want to cancel this order?' }, class: 'btn btn-danger' if  @order.Placed? %>
+<%= button_to 'Cancel Order', cancel_order_path, data: { turbo_confirm: 'Are you sure you want to cancel this order?' }, class: 'btn btn-danger' if  @order.placed? %>

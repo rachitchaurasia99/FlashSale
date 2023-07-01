@@ -3,34 +3,35 @@ class Admin::OrdersController < Admin::BaseController
   
   def index
     if params[:email]
-      @orders = User.find_by(email: params[:email]).orders.not_InProgress
+      @orders = User.find_by(email: params[:email]).orders.not_in_rogress
       flash[:notice] = 'No orders found' if @orders.empty?
     else
-      @orders = Order.not_InProgress
+      @orders = Order.not_in_progress
     end
   end
 
   def deliver_order
-    @order.Delivered!
+    @order.delivered!
     OrderMailer.with(order: @order).delivered.deliver_later
-    redirect_to request.referer
+    redirect_back fallback_location: admin_orders_path
   end
 
   def cancel_order
-    payment_intent = Stripe::PaymentIntent.retrieve(@order.payments.successful.payment_intent)
-    refund = Stripe::Refund.create({
-      payment_intent: payment_intent
-    })
-    @order.refunds.create(refund_id: refund.id, status: 'Successful', currency: 'inr', total_amount_in_cents: refund.amount)
-    @order.Cancelled!
-    OrderMailer.with(order: @order, refund_id: refund.id).cancelled.deliver_later
-    redirect_to request.referer
+    refund_session = StripeRefundHandler.new(@order)
+    refund = refund_session.create_refund
+    unless refund_session.messages[:alert]
+      @order.cancel_order(refund)
+      flash[:notice] = refund_session.messages[:notice]
+    else
+      flash[:alert] = refund_session.messages[:alert]
+    end
+    redirect_back fallback_location: admin_orders_path
   end
 
   private 
 
   def set_order
     @order = Order.find_by(id: params[:id])
-    redirect_to request.referer, alert: "Order Not found" unless @order
+    redirect_back fallback_location: admin_orders_path, alert: "Order Not found" unless @order
   end
 end
