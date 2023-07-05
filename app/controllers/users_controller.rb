@@ -1,7 +1,7 @@
 class UsersController < ApplicationController
-  before_action :set_user, only: %i[soft_delete]
+  before_action :set_user, only: %i[deactivate]
 
-  def soft_delete
+  def deactivate
     @user.discard
     redirect_to admin_users_path, notice: 'Account Deactivated'
   end

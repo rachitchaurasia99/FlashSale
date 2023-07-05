@@ -9,7 +9,7 @@ Rails.application.routes.draw do
   resources :users do
     resources :orders
     member do
-      delete :soft_delete
+      delete :deactivate
     end
   end
 
@@ -18,9 +18,9 @@ Rails.application.routes.draw do
   resources :orders do
     member do
       post 'payment'
-      post 'cancel_order', as: 'cancel'
+      post 'cancel'
+      get 'cancel_payment', as: 'cancel_payment'
       get 'success'
-      get 'cancel'
       get 'checkout'
       get 'cart' 
       patch 'checkout'
@@ -55,7 +55,7 @@ Rails.application.routes.draw do
     end
     resources :users do
       member do
-        delete :soft_delete
+        delete :deactivate
       end
     end
     resources :orders do
@@ -64,8 +64,6 @@ Rails.application.routes.draw do
         post 'cancel', to: 'orders#cancel_order'
       end
     end
-    resources :deals do
-      patch 'check_publishablity', to: 'deals#check_publishablity', on: :member
-    end
+    resources :deals
   end
 end
