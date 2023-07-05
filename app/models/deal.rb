@@ -19,6 +19,8 @@ class Deal < ApplicationRecord
 
   validate :valid_publish_at, on: :update
 
+  before_save :calculate_tax_on_deal
+
   scope :all_deals, ->{ includes(deal_images: { image_attachment: :blob }) }
   scope :live, ->{ all_deals.where(publishable: true).where.not(published_at: nil) }
   scope :expired, ->{ live.rewhere(publishable: false) }
