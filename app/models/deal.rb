@@ -19,7 +19,7 @@ class Deal < ApplicationRecord
 
   validate :valid_publish_at, on: :update
 
-  before_save :calculate_tax_on_deal
+  before_validation :calculate_tax_on_deal
 
   scope :all_deals, ->{ includes(deal_images: { image_attachment: :blob }) }
   scope :live, ->{ all_deals.where(publishable: true).where.not(published_at: nil) }
@@ -55,7 +55,7 @@ class Deal < ApplicationRecord
   end
 
   def calculate_tax_on_deal
-    self.tax_in_cents = discount_price * tax_percentage
+    self.tax_in_cents = discount_price * tax_percentage if discount_price_in_cents && tax_percentage
   end
 
   def expiring_soon?

@@ -1,5 +1,5 @@
 class OrdersController < ApplicationController
-  before_action :set_order, only: %i[show edit update destroy payment success cancel cancel_order]
+  before_action :set_order, only: %i[show edit update destroy payment success cancel cancel_payment]
   before_action :set_line_item, only: [:remove_from_cart]
   before_action :set_deal, only: [:add_to_cart]
 
@@ -96,7 +96,7 @@ class OrdersController < ApplicationController
   end
 
   def payment
-    stripe_session = StripeHandler.new(success_order_url, cancel_order_url, @order).create_stripe_session
+    stripe_session = StripeHandler.new(success_order_url, cancel_payment_order_url, @order).create_stripe_session
     @order.payments.create(session_id: stripe_session.id, currency: stripe_session.currency, status: 'pending', total_amount_in_cents: @order.net_in_cents)
     redirect_to stripe_session.url, allow_other_host: true
   end
@@ -110,12 +110,12 @@ class OrdersController < ApplicationController
     OrderMailer.with(order: current_user.orders.placed.last).received.deliver_later
   end
 
-  def cancel
+  def cancel_payment
     @order.payments.last.failed!
     redirect_to checkout_order_path, alert: 'Payment was cancelled'
   end
 
-  def cancel_order
+  def cancel
     if Deal.expiring_soon(@order)
       flash[:notice] = "Order can't be cancelled 30 minutes before the deal ends"
     else

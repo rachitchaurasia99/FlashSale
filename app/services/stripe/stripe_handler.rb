@@ -23,7 +23,7 @@ class StripeHandler
       { quantity: 1,
         price_data: {
           currency: 'inr',
-          unit_amount: line_item.net_price.to_i * 100,
+          unit_amount: line_item.net_in_cents,
           product_data: { 
             name: line_item.deal.title 
           }

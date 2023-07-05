@@ -20,16 +20,11 @@ class Admin::UsersController < Admin::BaseController
   end
 
   def destroy
-    if @user.destroy
-      redirect_to admin_users_path, notice: "User #{@user.email} was successfully destroyed."
+    if @user.discard!
+      redirect_to admin_users_path, notice: "User #{@user.email} was successfully disabled."
     else
       render :new, status: :unprocessable_entity 
     end
-  end
-
-  def soft_delete
-    @user.discard!
-    redirect_to admin_users_path, notice: 'User soft deleted.'
   end
 
   private 

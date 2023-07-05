@@ -8,9 +8,6 @@ Rails.application.routes.draw do
 
   resources :users do
     resources :orders
-    member do
-      delete :soft_delete
-    end
   end
 
   resources :addresses, only: [:new, :create]
@@ -18,9 +15,9 @@ Rails.application.routes.draw do
   resources :orders do
     member do
       post 'payment'
-      post 'cancel_order', as: 'cancel'
+      post 'cancel'
+      get 'cancel_payment', as: 'cancel_payment'
       get 'success'
-      get 'cancel'
       get 'checkout'
       get 'cart' 
       patch 'checkout'
@@ -53,11 +50,7 @@ Rails.application.routes.draw do
         get 'customers' => :customers
       end
     end
-    resources :users do
-      member do
-        delete :soft_delete
-      end
-    end
+    resources :users
     resources :orders do
       member do
         post 'deliver', to: 'orders#deliver_order'
