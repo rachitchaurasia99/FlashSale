@@ -18,9 +18,9 @@ Rails.application.routes.draw do
   resources :orders do
     member do
       post 'payment'
-      post 'cancel_order', as: 'cancel'
+      post 'cancel'
+      get 'cancel_payment', as: 'cancel_payment'
       get 'success'
-      get 'cancel'
       get 'checkout'
       get 'cart' 
       patch 'checkout'

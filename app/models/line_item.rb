@@ -5,7 +5,6 @@ class LineItem < ApplicationRecord
   before_save :calculate_net_price
 
   def calculate_net_price
-    deal = Deal.find(self.deal_id)
     self.total_in_cents = price_in_cents * quantity
     self.total_discount_price_in_cents = discount_price_in_cents * quantity
     self.tax_in_cents = deal.tax_percentage * total_discount_price

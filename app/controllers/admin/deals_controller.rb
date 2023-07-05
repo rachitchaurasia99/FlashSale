@@ -10,6 +10,7 @@ class Admin::DealsController < Admin::BaseController
   end
 
   def show
+    @deal = Deal.includes(deal_images: { image_attachment: :blob } ).where(id: params[:id]).first
   end
 
   def edit
@@ -17,7 +18,6 @@ class Admin::DealsController < Admin::BaseController
 
   def create
     @deal = Deal.new(deal_params)
-    @deal.calculate_tax_on_deal
     if @deal.save
       redirect_to admin_deals_path, notice: "Deal was successfully created."
     else
@@ -26,7 +26,6 @@ class Admin::DealsController < Admin::BaseController
   end
 
   def update
-    @deal.calculate_tax_on_deal
     if @deal.update(deal_params)
       redirect_to admin_deals_path, notice: "Deal was successfully updated."
     else
@@ -45,7 +44,7 @@ class Admin::DealsController < Admin::BaseController
   private 
 
   def set_deal
-    @deal = Deal.where(id: params[:id]).includes(deal_images: { image_attachment: :blob } )
+    @deal = Deal.find_by(id: params[:id])
     redirect_to admin_deals_path, notice: "Deal Not found" unless @deal
   end
 

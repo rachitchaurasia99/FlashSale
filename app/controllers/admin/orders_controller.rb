@@ -3,7 +3,7 @@ class Admin::OrdersController < Admin::BaseController
   
   def index
     if params[:email]
-      @orders = User.find_by(email: params[:email]).orders.not_in_rogress
+      @orders = User.find_by(email: params[:email]).orders.not_in_progress
       flash[:notice] = 'No orders found' if @orders.empty?
     else
       @orders = Order.includes(:address).not_in_progress
