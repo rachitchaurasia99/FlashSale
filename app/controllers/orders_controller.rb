@@ -51,7 +51,7 @@ class OrdersController < ApplicationController
     if current_user.orders.deal_exists(@deal.id).any?
       redirect_to root_path, alert: 'You can only buy one quantity of this deal'
     else
-      conversion_rate = Currency.where(name: current_user.currency_preference).last.conversion_rate
+      conversion_rate = Currency.current_rate[current_user.currency_preference].to_f
       @line_item = current_order.line_items.create(
         deal_id: @deal.id,
         quantity: 1,

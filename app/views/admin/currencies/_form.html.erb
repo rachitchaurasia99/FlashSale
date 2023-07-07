@@ -1,17 +1,16 @@
 <%= form_with(model: [:admin, currency]) do |form| %>
   <%= render 'shared/errors', object: currency %>
 
-  <div>
-    <%= form.label :name %>
-    <%= form.text_field :name %>
-  </div>
+  <% CURRENCIES.each do |currency| %>
+    <strong><%= currency %></strong>
+
+    <div>
+      <%= form.label :conversion_rate %>
+      <%= form.text_field "conversion_rates[#{currency}]" %>
+    </div>
+  <% end %>
 
   <div>
-    <%= form.label :conversion_rate %>
-    <%= form.text_field :conversion_rate %>
-  </div>
-
-  <div>
-    <%= form.submit %>
+    <%= form.submit 'Submit' %>
   </div>
 <% end %>

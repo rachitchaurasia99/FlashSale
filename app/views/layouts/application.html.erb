@@ -26,7 +26,7 @@
         <%= button_to 'Log out', destroy_user_session_path, method: :delete %>
         <% if controller_name == 'store' %>
           <%= form_with(model: current_user) do |form| %>
-            <%= form.collection_select :currency_preference, Currency.current_rate, :name, :name, include_blank: current_user.currency_preference %>
+            <%= form.collection_select :currency_preference, Currency.current_rate, :first, :first, include_blank: current_user.currency_preference %>
             <%= form.submit 'Convert' %>
           <% end %>
         <% end %>

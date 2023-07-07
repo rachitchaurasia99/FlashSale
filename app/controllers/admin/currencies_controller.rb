@@ -19,6 +19,6 @@ class Admin::CurrenciesController < Admin::BaseController
   private
 
   def currency_params
-    params.require(:currency).permit(:name, :conversion_rate)
+    params.require(:currency).permit(conversion_rates: {})
   end
 end
