@@ -51,11 +51,12 @@ class OrdersController < ApplicationController
     if current_user.orders.deal_exists(@deal.id).any?
       redirect_to root_path, alert: 'You can only buy one quantity of this deal'
     else
+      conversion_rate = Currency.where(name: current_user.currency_preference).last.conversion_rate
       @line_item = current_order.line_items.create(
         deal_id: @deal.id,
         quantity: 1,
-        discount_price_in_cents: @deal.discount_price_in_cents,
-        price_in_cents: @deal.price_in_cents
+        discount_price_in_cents: @deal.discount_price_in_cents * conversion_rate,
+        price_in_cents: @deal.price_in_cents * conversion_rate
       )
       @deal.decrement!(:quantity, 1)
       if @deal.quantity.zero?
@@ -96,7 +97,7 @@ class OrdersController < ApplicationController
   end
 
   def payment
-    stripe_session = StripeHandler.new(success_order_url: success_order_url, cancel_payment_order_url: cancel_payment_order_url, order: @order).create_stripe_session
+    stripe_session = StripeHandler.new(success_order_url: success_order_url, cancel_payment_order_url: cancel_payment_order_url, order: @order, currency: current_user.currency_preference).create_stripe_session
     @order.payments.create(session_id: stripe_session.id, currency: stripe_session.currency, status: 'pending', total_amount_in_cents: @order.net_in_cents)
     redirect_to stripe_session.url, allow_other_host: true
   end

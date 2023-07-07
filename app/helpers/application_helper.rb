@@ -8,7 +8,19 @@ module ApplicationHelper
     link_to(name, '#', class: "add_fields", data: {id: id, fields: fields.gsub("\n", "")})
   end
 
+  def price_in_dollar(price)
+    price.to_fs(:currency, unit: '$', format: '%u %n')
+  end
+
   def price_in_currency(price)
-    price.to_fs(:currency, unit: '₹', format: '%u %n')
+    price.to_fs(:currency, unit: current_user.currency_preference, format: '%u %n')
+  end
+
+  def converted_price(price)
+    if user_signed_in?
+      (price * Currency.where(name: current_user.currency_preference).last.conversion_rate).to_fs(:currency, unit: current_user.currency_preference, format: '%u %n')
+    else
+      price_in_dollar(price)
+    end
   end
 end
