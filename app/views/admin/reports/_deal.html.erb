@@ -1,5 +1,5 @@
 <td><%= "Deal #{deal.id}" %></td>
 <td><%= deal.title %></td>
-<td><%= price_in_dollar(deal.deal_price_with_tax * deal.orders_count) %></td>
-<td><%= price_in_dollar(deal.deal_price_with_tax) %>
-<td><%= price_in_dollar(deal.deal_price_with_tax * (deal.quantity + deal.orders_count)) %>
+<td><%= converted_price(deal.deal_price_with_tax * deal.orders_count) %></td>
+<td><%= converted_price(deal.deal_price_with_tax) %>
+<td><%= converted_price(deal.deal_price_with_tax * (deal.quantity + deal.orders_count)) %>
