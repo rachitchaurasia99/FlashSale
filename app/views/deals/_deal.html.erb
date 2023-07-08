@@ -13,11 +13,11 @@
 
   <div>
     <strong>Original Price</strong>
-    <s><%= converted_price(deal.price) %></s>
+    <s><%= price_in_currency(deal.price) %></s>
   </div>
 
   <div>
     <strong>Deal Price</strong>
-    <%= converted_price(deal.discount_price) %>
+    <%= price_in_currency(deal.discount_price) %>
   </div>
 </div>

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_07_06_132451) do
+ActiveRecord::Schema[7.0].define(version: 2023_07_08_070451) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -53,6 +53,16 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_06_132451) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_addresses_on_user_id"
+  end
+
+  create_table "coupons", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "code", null: false
+    t.integer "redeem_count", default: 0
+    t.datetime "issued_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_coupons_on_user_id"
   end
 
   create_table "currencies", force: :cascade do |t|
@@ -113,6 +123,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_06_132451) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "currency"
+    t.boolean "coupon_applied", default: false
     t.index ["address_id"], name: "index_orders_on_address_id"
     t.index ["user_id"], name: "index_orders_on_user_id"
   end
@@ -168,6 +179,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_06_132451) do
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "addresses", "users"
+  add_foreign_key "coupons", "users"
   add_foreign_key "deal_images", "deals"
   add_foreign_key "line_items", "deals"
   add_foreign_key "line_items", "orders"

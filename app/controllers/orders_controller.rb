@@ -1,5 +1,5 @@
 class OrdersController < ApplicationController
-  before_action :set_order, only: %i[show edit update destroy payment success cancel cancel_payment]
+  before_action :set_order, only: %i[show edit update destroy payment success cancel cancel_payment coupon cart]
   before_action :set_line_item, only: [:remove_from_cart]
   before_action :set_deal, only: [:add_to_cart]
 
@@ -41,7 +41,6 @@ class OrdersController < ApplicationController
   end
 
   def cart
-    @order = Order.eager_load(deals: { deal_images: { image_attachment: :blob } } ).where(id: current_order.id).first
     if @order.line_items.empty?
       redirect_to root_path, alert: "You have no deals selected"
     end
@@ -51,12 +50,11 @@ class OrdersController < ApplicationController
     if current_user.orders.deal_exists(@deal.id).any?
       redirect_to root_path, alert: 'You can only buy one quantity of this deal'
     else
-      conversion_rate = Currency.current_rate[current_user.currency_preference].to_f
       @line_item = current_order.line_items.create(
         deal_id: @deal.id,
         quantity: 1,
-        discount_price_in_cents: @deal.discount_price_in_cents * conversion_rate,
-        price_in_cents: @deal.price_in_cents * conversion_rate
+        discount_price_in_cents: helpers.converted_price(@deal.discount_price_in_cents),
+        price_in_cents: helpers.converted_price(@deal.price_in_cents)
       )
       @deal.decrement!(:quantity, 1)
       if @deal.quantity.zero?
@@ -133,6 +131,20 @@ class OrdersController < ApplicationController
       end
     end
     redirect_back fallback_location: order_path(@order)
+  end
+
+  def coupon
+    coupon = current_user.coupons.last
+    if !@order.coupon_applied && coupon.is_valid?(params[:code]) && current_user.id = coupon.user_id
+      @order.net_in_cents -= helpers.converted_price(COUPON_DISCOUNT_IN_CENTS).to_i
+      @order.coupon_applied = true
+      coupon.redeem_count += 1
+      coupon.save
+      @order.save
+      redirect_to cart_order_path(@order), notice: "Coupon Applied"
+    else
+      redirect_back fallback_location: cart_order_path(@order), notice: 'Invalid Coupon'
+    end
   end
 
   private 
