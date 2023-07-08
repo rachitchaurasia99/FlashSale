@@ -1,10 +1,12 @@
 class Currency < ApplicationRecord
-  before_create :set_date
-
   validate :conversion_rates_presence
 
+  before_validation :set_date
+
   def self.current_rate
-    last.conversion_rates
+    rates = last.conversion_rates
+    rates = { "usd"=> "1"} if rates.empty?
+    rates
   end
 
   def set_date
@@ -18,6 +20,6 @@ class Currency < ApplicationRecord
   private
 
   def conversion_rates_presence
-    errors.add(:base, 'Please enter all conversion rates') if conversion_rates.values.any?(&:blank?)
+    errors.add(:base, 'Please enter all conversion rates') if conversion_rates.empty? || conversion_rates.values.any?(&:blank?)
   end
 end

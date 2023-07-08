@@ -12,13 +12,21 @@ module ApplicationHelper
     price.to_fs(:currency, unit: '$', format: '%u %n')
   end
 
-  def price_in_currency(price)
+  def price_in_user_currency(price)
     price.to_fs(:currency, unit: current_user.currency_preference, format: '%u %n')
+  end
+
+  def price_in_currency(price)
+    if user_signed_in?
+      converted_price(price).to_fs(:currency, unit: current_user.currency_preference, format: '%u %n')
+    else
+      price_in_dollar(price)
+    end
   end
 
   def converted_price(price)
     if user_signed_in?
-      (price * Currency.current_rate[current_user.currency_preference].to_f).to_fs(:currency, unit: current_user.currency_preference, format: '%u %n')
+      price * Currency.current_rate[current_user.currency_preference].to_f
     else
       price_in_dollar(price)
     end
