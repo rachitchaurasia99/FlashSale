@@ -13,7 +13,9 @@ class Order < ApplicationRecord
   
   def apply_coupon(coupon, coupon_discount)
     if coupon.is_valid?
-      self.net_in_cents -= coupon_discount
+      self.coupon[:applied_coupon] = coupon.code
+      self.coupon[:coupon_amount] = coupon_discount
+      save
     end
   end
 

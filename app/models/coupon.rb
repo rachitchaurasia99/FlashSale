@@ -11,6 +11,6 @@ class Coupon < ApplicationRecord
   end
 
   def is_valid?
-    issued_at.to_date == Date.current && redeem_count.to_i < MAXIMUM_COUPON_ATTEMPTS
+    issued_at.to_date == Date.current && redeem_count < MAXIMUM_COUPON_ATTEMPTS
   end
 end
