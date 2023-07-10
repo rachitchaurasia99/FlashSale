@@ -1,5 +1,5 @@
 class OrdersController < ApplicationController
-  before_action :set_order, only: %i[show edit update destroy payment success cancel cancel_payment coupon cart]
+  before_action :set_order, only: %i[show edit update destroy payment success cancel cancel_payment apply_coupon cart]
   before_action :set_line_item, only: [:remove_from_cart]
   before_action :set_deal, only: [:add_to_cart]
 
@@ -41,7 +41,10 @@ class OrdersController < ApplicationController
   end
 
   def cart
+    @order.net_in_cents =  @order.net_in_cents - cookies[:coupon_amount].to_i
     if @order.line_items.empty?
+      cookies.delete(:coupon_amount)
+      cookies.delete(:applied_coupon)
       redirect_to root_path, alert: "You have no deals selected"
     end
   end
@@ -95,6 +98,7 @@ class OrdersController < ApplicationController
   end
 
   def payment
+    @order.net_in_cents = @order.net_in_cents - cookies[:coupon_amount].to_i
     stripe_session = StripeHandler.new(success_order_url: success_order_url, cancel_payment_order_url: cancel_payment_order_url, order: @order, currency: current_user.currency_preference).create_stripe_session
     @order.payments.create(session_id: stripe_session.id, currency: stripe_session.currency, status: 'pending', total_amount_in_cents: @order.net_in_cents)
     redirect_to stripe_session.url, allow_other_host: true
@@ -103,9 +107,11 @@ class OrdersController < ApplicationController
   def success
     checkout_session = StripeHandler.retrieve_session(@order)
     ActiveRecord::Base.transaction do
-      @order.update_columns({ status: 'placed', order_at: Time.current })
+      @order.update_columns({ status: 'placed', order_at: Time.current, net_in_cents: @order.net_in_cents - cookies[:coupon_amount].to_i })
       @order.payments.last.update_columns({ status: 'successful', payment_intent: checkout_session.payment_intent })
+      Coupon.where(code: cookies[:applied_coupon]).first.increment!(:redeem_count) if cookies[:applied_coupon]
     end
+    cookies.delete(:applied_coupon, :coupon_amount)
     OrderMailer.with(order: current_user.orders.placed.last).received.deliver_later
   end
 
@@ -133,14 +139,11 @@ class OrdersController < ApplicationController
     redirect_back fallback_location: order_path(@order)
   end
 
-  def coupon
-    coupon = current_user.coupons.last
-    if !@order.coupon_applied && coupon.is_valid?(params[:code]) && current_user.id = coupon.user_id
-      @order.net_in_cents -= helpers.converted_price(COUPON_DISCOUNT_IN_CENTS).to_i
-      @order.coupon_applied = true
-      coupon.redeem_count += 1
-      coupon.save
-      @order.save
+  def apply_coupon
+    coupon = current_user.coupons.where(code: params[:code]).first
+    if coupon && current_user.id = coupon.user_id && @order.apply_coupon(coupon, helpers.converted_price(COUPON_DISCOUNT_IN_CENTS))
+      cookies[:applied_coupon] = params[:applied_coupon]
+     cookies[:coupon_amount] = helpers.converted_price(COUPON_DISCOUNT_IN_CENTS)
       redirect_to cart_order_path(@order), notice: "Coupon Applied"
     else
       redirect_back fallback_location: cart_order_path(@order), notice: 'Invalid Coupon'

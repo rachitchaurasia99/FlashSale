@@ -32,7 +32,7 @@
 </br>
 <div>
   <strong>Have a coupon code?</strong>
-  <%= form_tag coupon_order_path , method: :post do %>
+  <%= form_tag apply_coupon_order_path , method: :post do %>
     <div class="input-group mb-3">
       <%= text_field_tag :code, params[:code], class: "form-control", placeholder: "Enter Coupon Code" %>
       <div class="input-group-append">

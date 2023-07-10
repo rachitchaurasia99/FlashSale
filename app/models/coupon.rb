@@ -3,18 +3,14 @@ class Coupon < ApplicationRecord
 
   has_secure_token :code
 
-  before_validation :set_issued_at
-  after_create :generate_code
-  
-  def set_issued_at
-    self.issued_at = DateTime.current.beginning_of_day
-  end
+  before_validation :generate_code
 
   def generate_code
-    regenerate_code
+    self.issued_at = DateTime.current.beginning_of_day
+    self.code = SecureRandom.hex(4)
   end
 
-  def is_valid?(applied_code)
-    issued_at.to_date == Date.current && redeem_count.to_i <= MAXIMUM_COUPON_ATTEMPTS && applied_code == code
+  def is_valid?
+    issued_at.to_date == Date.current && redeem_count.to_i < MAXIMUM_COUPON_ATTEMPTS
   end
 end
