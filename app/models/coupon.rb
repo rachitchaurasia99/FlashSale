@@ -1,11 +1,17 @@
 class Coupon < ApplicationRecord
   belongs_to :user
 
-  before_save :generate_code
+  has_secure_token :code
+
+  before_validation :set_issued_at
+  after_create :generate_code
+  
+  def set_issued_at
+    self.issued_at = DateTime.current.beginning_of_day
+  end
 
   def generate_code
-    self.code = SecureRandom.hex(4)
-    self.issued_at = DateTime.current.beginning_of_day
+    regenerate_code
   end
 
   def is_valid?(applied_code)
