@@ -39,7 +39,6 @@ class StripeHandler
   end
 
   def generate_line_items
-    debugger
     @order.line_items.map do |line_item|
       { quantity: 1,
         price_data: {
