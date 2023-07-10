@@ -143,7 +143,7 @@ class OrdersController < ApplicationController
     coupon = current_user.coupons.where(code: params[:code]).first
     if coupon && current_user.id = coupon.user_id && @order.apply_coupon(coupon, helpers.converted_price(COUPON_DISCOUNT_IN_CENTS))
       cookies[:applied_coupon] = params[:applied_coupon]
-     cookies[:coupon_amount] = helpers.converted_price(COUPON_DISCOUNT_IN_CENTS)
+      cookies[:coupon_amount] = helpers.converted_price(COUPON_DISCOUNT_IN_CENTS)
       redirect_to cart_order_path(@order), notice: "Coupon Applied"
     else
       redirect_back fallback_location: cart_order_path(@order), notice: 'Invalid Coupon'
