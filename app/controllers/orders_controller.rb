@@ -42,7 +42,11 @@ class OrdersController < ApplicationController
   end
 
   def cart
+    @order.net_in_cents -= @order.coupon['coupon_amount'].to_i
     if @order.line_items.empty?
+      @order.coupon.delete('coupon_amount')
+      @order.coupon.delete('applied_coupon')
+      @order.save
       redirect_to root_path, alert: "You have no deals selected"
     end
   end
@@ -138,6 +142,7 @@ class OrdersController < ApplicationController
   end
 
   def payment
+    @order.net_in_cents = @order.net_in_cents - @order.coupon['coupon_amount'].to_i
     stripe_session = StripeHandler.new(success_order_url: success_order_url, cancel_payment_order_url: cancel_payment_order_url, order: @order, currency: current_user.currency_preference).create_stripe_session
     @order.payments.create(session_id: stripe_session.id, currency: stripe_session.currency, status: 'pending', total_amount_in_cents: @order.net_in_cents)
     redirect_to stripe_session.url, allow_other_host: true
@@ -146,8 +151,9 @@ class OrdersController < ApplicationController
   def success
     checkout_session = StripeHandler.retrieve_session(@order)
     ActiveRecord::Base.transaction do
-      @order.update_columns({ status: 'placed', order_at: Time.current })
+      @order.update_columns({ status: 'placed', order_at: Time.current, net_in_cents: @order.net_in_cents - @order.coupon['coupon_amount'].to_i })
       @order.payments.last.update_columns({ status: 'successful', payment_intent: checkout_session.payment_intent })
+      Coupon.where(coupon_type: @order.coupon['applied_coupon'][0], value: @order.coupon['applied_coupon][1]']).first.increment!(:redeem_count) if @order.coupon['applied_coupon']
     end
     OrderMailer.with(order: current_user.orders.placed.last).received.deliver_later
   end
@@ -174,6 +180,15 @@ class OrdersController < ApplicationController
       end
     end
     redirect_back fallback_location: order_path(@order)
+  end
+
+  def apply_coupon
+    coupon = Coupon.active.where(coupon_type: params[:code].split[0], value: params[:code].split[1]).first
+    if coupon && @order.apply_coupon(coupon, coupon.coupon_type == 'flat' ? helpers.converted_price(helpers.convert_to_dollar(coupon.value_in_cents,coupon.currency)) : (coupon.value * 0.01 * @order.net_in_cents))
+      redirect_to cart_order_path(@order), notice: "Coupon Applied"
+    else
+      redirect_back fallback_location: cart_order_path(@order), notice: 'Invalid Coupon'
+    end
   end
 
   private 

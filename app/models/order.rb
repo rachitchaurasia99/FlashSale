@@ -11,6 +11,12 @@ class Order < ApplicationRecord
   scope :placed_orders, ->{ includes(:address, :payments).where(status: 'placed').where(payments: { status: 'successful' }) }
   scope :deal_exists, ->(deal_id){ joins(:deals).where(deals: { id: deal_id }) }
   
+  def apply_coupon(coupon, coupon_discount)
+    self.coupon[:applied_coupon] = "#{coupon.coupon_type} #{coupon.value}"
+    self.coupon[:coupon_amount] = coupon_discount
+    save
+  end
+
   def cancel_order(refund)
     transaction do
       cancelled!
