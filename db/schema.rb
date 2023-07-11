@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_07_06_132451) do
+ActiveRecord::Schema[7.0].define(version: 2023_07_11_120906) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -53,6 +53,15 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_06_132451) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_addresses_on_user_id"
+  end
+
+  create_table "coupons", force: :cascade do |t|
+    t.string "coupon_type"
+    t.string "currency"
+    t.integer "value", default: 0
+    t.integer "status", default: 0
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "currencies", force: :cascade do |t|
@@ -113,6 +122,8 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_06_132451) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "currency"
+    t.json "coupon", default: {}
+    t.boolean "wishlist", default: false
     t.index ["address_id"], name: "index_orders_on_address_id"
     t.index ["user_id"], name: "index_orders_on_user_id"
   end
