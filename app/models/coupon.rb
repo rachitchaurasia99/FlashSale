@@ -1,16 +1,12 @@
 class Coupon < ApplicationRecord
-  belongs_to :user
+  enum :status, { inactive: 0, active: 1}
 
-  has_secure_token :code
+  validates :coupon_type, :value, :currency, presence: true
+  validates :coupon_type, inclusion: { in: ['flat', 'percent'] }
+  validates :value, numericality: { greater_than: 0 }
+  validates :currency, inclusion: { in: CURRENCIES }
 
-  before_validation :generate_code
-
-  def generate_code
-    self.issued_at = DateTime.current.beginning_of_day
-    self.code = SecureRandom.hex(4)
-  end
-
-  def is_valid?
-    issued_at.to_date == Date.current && redeem_count < MAXIMUM_COUPON_ATTEMPTS
+  def value_in_cents
+    value * 100
   end
 end

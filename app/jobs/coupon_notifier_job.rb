@@ -1,8 +1,9 @@
 class CouponNotifierJob < ApplicationJob
   def perform
-    User.active.each do |user|
-      coupon = user.coupons.create
-      CouponMailer.send_coupon(user, coupon).deliver_now
+    Coupon.active.each do |coupon|
+      User.active.each do |user|
+        CouponMailer.send_coupon(user, "#{coupon.coupon_type} #{coupon.value}").deliver_now
+      end
     end
   end
 end

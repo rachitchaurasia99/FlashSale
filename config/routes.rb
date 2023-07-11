@@ -55,6 +55,13 @@ Rails.application.routes.draw do
       end
     end
     resources :currencies, only: [:new, :create, :index]
+    resources :coupons, only: [:new, :create, :index] do
+      member do
+        post 'active'
+        post 'inactive'
+      end
+    end
+
     resources :users do
       member do
         delete :deactivate

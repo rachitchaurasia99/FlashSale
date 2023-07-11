@@ -12,11 +12,9 @@ class Order < ApplicationRecord
   scope :deal_exists, ->(deal_id){ joins(:deals).where(deals: { id: deal_id }) }
   
   def apply_coupon(coupon, coupon_discount)
-    if coupon.is_valid?
-      self.coupon[:applied_coupon] = coupon.code
-      self.coupon[:coupon_amount] = coupon_discount
-      save
-    end
+    self.coupon[:applied_coupon] = "#{coupon.coupon_type} #{coupon.value}"
+    self.coupon[:coupon_amount] = coupon_discount
+    save
   end
 
   def cancel_order(refund)

@@ -56,13 +56,12 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_10_120859) do
   end
 
   create_table "coupons", force: :cascade do |t|
-    t.bigint "user_id", null: false
-    t.string "code", null: false
-    t.integer "redeem_count", default: 0
-    t.datetime "issued_at", null: false
+    t.string "coupon_type"
+    t.string "currency"
+    t.integer "value", default: 0
+    t.integer "status", default: 0
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["user_id"], name: "index_coupons_on_user_id"
   end
 
   create_table "currencies", force: :cascade do |t|
@@ -179,7 +178,6 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_10_120859) do
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "addresses", "users"
-  add_foreign_key "coupons", "users"
   add_foreign_key "deal_images", "deals"
   add_foreign_key "line_items", "deals"
   add_foreign_key "line_items", "orders"
