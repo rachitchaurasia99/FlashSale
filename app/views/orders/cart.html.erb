@@ -26,6 +26,11 @@
 </div>
 
 <div>
+  <strong>Coupon Discount</strong>
+  <%= price_in_user_currency(@order.coupon_discount) %>
+</div>
+
+<div>
   <strong>Net Total</strong>
   <%= price_in_user_currency(@order.net_total) %>
 </div>

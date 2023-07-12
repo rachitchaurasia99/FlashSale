@@ -2,7 +2,7 @@ class Admin::CouponsController < Admin::BaseController
   before_action :set_coupon, only: %i[active inactive]
 
   def index
-    @coupons = Coupon.all
+    @coupons = Coupon.order(:id)
   end
 
   def new
@@ -19,11 +19,7 @@ class Admin::CouponsController < Admin::BaseController
   end
 
   def active
-    Coupon.transaction do
-      Coupon.update_all(status: inactive)
-      @coupon.active!
-    end
-  
+    @coupon.active
     redirect_back fallback_location: admin_coupons_path, notice: 'Coupon activated successfully.'
   end
 
@@ -39,6 +35,6 @@ class Admin::CouponsController < Admin::BaseController
   end
 
   def coupon_params
-    params.require(:coupon).permit(:coupon_type, :currency, :value)
+    params.require(:coupon).permit(:code, :coupon_type, :currency, :value)
   end
 end

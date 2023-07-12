@@ -32,7 +32,7 @@ module ApplicationHelper
     end
   end
 
-  def convert_to_dollar(price, currency)
+  def convert_to_currency(price, currency)
     price / Currency.current_rate[currency].to_f
   end
 end
