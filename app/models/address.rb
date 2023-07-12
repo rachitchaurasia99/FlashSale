@@ -11,7 +11,7 @@ class Address < ApplicationRecord
   # before_validation :address_validator
 
   def address_validator
-    if Address.find_by(city: city, state: state, country: country, pincode: pincode) != self
+    if Address.where(city: city, state: state, country: country, pincode: pincode).where.not(id: self.id).first
       errors.add(:base, 'Address already exists')
     end
   end
