@@ -4,18 +4,14 @@ class Address < ApplicationRecord
   
   validates :name, :email, :city, :state, :country, :pincode, presence: true
 
-  validates :city, uniqueness: { scope: [:state, :country, :pincode], message: ', State, Country and Pincode combination already taken' }, if: :attributes_changed?
+  validates :city, uniqueness: { scope: [:state, :country, :pincode], message: ', State, Country and Pincode combination already taken' }
 
-  # validate :address_validator, if: :attributes_changed?
+  # validate :address_validator
 
-  # before_validation :address_validator, if: :attributes_changed?
-
-  def attributes_changed?
-    city_changed? || state_changed? || country_changed? || pincode_changed?
-  end
+  # before_validation :address_validator
 
   def address_validator
-    if Address.find_by(city: city, state: state, country: country, pincode: pincode)
+    if Address.find_by(city: city, state: state, country: country, pincode: pincode) != self
       errors.add(:base, 'Address already exists')
     end
   end
