@@ -1,5 +1,5 @@
 class OrdersController < ApplicationController
-  before_action :set_order, only: %i[show edit update destroy payment success cancel cancel_payment coupon cart]
+  before_action :set_order, only: %i[show edit update destroy payment success cancel cancel_payment apply_coupon cart]
   before_action :set_line_item, only: [:remove_from_cart, :remove_from_wishlist, :move_to_cart]
   before_action :set_deal, only: [:add_to_cart, :add_to_wishlist]
   before_action :set_wishlist, only: [:add_to_wishlist, :remove_from_wishlist, :wishlist, :clear_wishlist]
