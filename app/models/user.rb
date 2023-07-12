@@ -9,7 +9,7 @@ class User < ApplicationRecord
   has_many :orders
   has_many :payments, through: :orders
   has_many :addresses, dependent: :destroy
-  has_many :coupons, dependent: :destroy
+  has_and_belongs_to_many :coupons, join_table: 'user_coupons'
 
   has_secure_token :auth_token
 

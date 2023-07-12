@@ -5,7 +5,7 @@ module OrderHelper
   end
 
   def user_wishlist
-    user_orders = current_user.orders
-    @wishlist = user_orders.where(wishlist: true).first || user_orders.create(wishlist: true)
+    wishlist = current_user.orders.wishlist
+    @wishlist = wishlist.first || wishlist.create
   end
 end
