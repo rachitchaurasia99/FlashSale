@@ -12,7 +12,7 @@ task :publishing_deals => :environment do
   end
   @unpublishing_deals.each do |deal|
     deal.update_column(:publishable, false)
-    Order.includes(:line_items).where(status: :wishlist).each do |wishlist|
+    Order.includes(:line_items).where(orders: { status: :wishlist }).each do |wishlist|
       wishlist.line_items do |line_item|
         line_item.destroy if line_item.deal_id = deal.id
       end
