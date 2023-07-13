@@ -96,7 +96,7 @@ class OrdersController < ApplicationController
   end
 
   def payment
-    stripe_session = StripeHandler.new(success_order_url, cancel_payment_order_url, @order).create_stripe_session
+    stripe_session = StripeHandler.new(success_order_url: success_order_url, cancel_payment_order_url: cancel_payment_order_url, order: @order).create_stripe_session
     @order.payments.create(session_id: stripe_session.id, currency: stripe_session.currency, status: 'pending', total_amount_in_cents: @order.net_in_cents)
     redirect_to stripe_session.url, allow_other_host: true
   end
@@ -119,7 +119,7 @@ class OrdersController < ApplicationController
     if Deal.expiring_soon(@order)
       flash[:notice] = "Order can't be cancelled 30 minutes before the deal ends"
     else
-      refund_session = StripeRefundHandler.new(@order)
+    refund_session = StripeHandler.new(order: @order).create_refund
       refund = refund_session.create_refund
       unless refund.messages[:alert]
         @order.cancel_order(refund)

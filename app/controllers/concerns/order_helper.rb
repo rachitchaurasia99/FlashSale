@@ -1,5 +1,6 @@
 module OrderHelper
   def current_order
-    @order = current_user.orders.in_progress.last || Order.in_progress.create(user_id: current_user.id)
+    current_orders = current_user.orders.in_progress
+    @order = current_orders.last || current_orders.create
   end
 end

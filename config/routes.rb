@@ -8,6 +8,9 @@ Rails.application.routes.draw do
 
   resources :users do
     resources :orders
+    member do
+      delete :deactivate
+    end
   end
 
   resources :addresses, only: [:new, :create]
@@ -50,15 +53,17 @@ Rails.application.routes.draw do
         get 'customers' => :customers
       end
     end
-    resources :users
+    resources :users do
+      member do
+        delete :deactivate
+      end
+    end
     resources :orders do
       member do
         post 'deliver', to: 'orders#deliver_order'
         post 'cancel', to: 'orders#cancel_order'
       end
     end
-    resources :deals do
-      patch 'check_publishablity', to: 'deals#check_publishablity', on: :member
-    end
+    resources :deals
   end
 end

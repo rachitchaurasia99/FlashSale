@@ -17,7 +17,7 @@ class Admin::OrdersController < Admin::BaseController
   end
 
   def cancel_order
-    refund_session = StripeRefundHandler.new(@order)
+    refund_session = StripeHandler.new(order: @order)
     refund = refund_session.create_refund
     unless refund_session.messages[:alert]
       @order.cancel_order(refund)

@@ -2,7 +2,7 @@ class Order < ApplicationRecord
   enum :status, { in_progress: 0, placed: 1, delivered: 2, cancelled: 3 }
   
   belongs_to :user
-  belongs_to :address
+  belongs_to :address, optional:true
   with_options dependent: :destroy do
     has_many :payments
     has_many :refunds

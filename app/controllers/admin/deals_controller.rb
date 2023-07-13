@@ -1,5 +1,5 @@
 class Admin::DealsController < Admin::BaseController
-  before_action :set_deal, only: %i[show edit update destroy check_publishablity]
+  before_action :set_deal, only: %i[show edit update destroy]
   
   def index
     @deals = Deal.all_deals
