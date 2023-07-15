@@ -1,5 +1,5 @@
 class OrdersController < ApplicationController
-  before_action :set_order, only: %i[show edit update destroy payment success cancel cancel_payment]
+  before_action :set_order, only: %i[show edit update destroy payment success cancel cancel_payment, cart]
   before_action :set_line_item, only: [:remove_from_cart]
   before_action :set_deal, only: [:add_to_cart]
 
@@ -41,7 +41,6 @@ class OrdersController < ApplicationController
   end
 
   def cart
-    @order = Order.eager_load(deals: { deal_images: { image_attachment: :blob } } ).where(id: current_order.id).first
     if @order.line_items.empty?
       redirect_to root_path, alert: "You have no deals selected"
     end
