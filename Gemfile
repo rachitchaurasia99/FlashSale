@@ -18,6 +18,8 @@ gem 'active_model_serializers', '~> 0.10.0'
 
 gem 'discard', '~> 1.2'
 
+gem 'faker', '~> 3.2'
+
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
 gem "rails", "~> 7.0.4", ">= 7.0.4.3"
 
