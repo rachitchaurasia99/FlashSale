@@ -3,13 +3,13 @@ require 'rails_helper'
 RefundID = 're_3NVVtQSBM6H1Ysf20a1ZOk0U'
 
 RSpec.describe "Admin::OrdersControllers", type: :request do
-  let!(:admin) { create(:user, :admin) }
+  let!(:admin) { create(:admin_user) }
   before { sign_in admin }
 
   describe "GET #index" do
     context 'when email parameter is present' do
-      let!(:user1) { create(:user, email: "user1@example.com") }
-      let!(:user2) { create(:user, email: "user2@example.com") }
+      let(:user1) { create(:user, email: "user1@example.com") }
+      let(:user2) { create(:user, email: "user2@example.com") }
       let!(:order1) { create(:order, user: user1) }
       let!(:order2) { create(:order, user: user2) }
       it 'should return order records' do

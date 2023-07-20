@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe Deal, type: :model do
   subject { described_class.new(title: 'abcd', description: 'This is a random deal', price_in_cents: 10000, discount_price_in_cents: 9000, quantity: 12, tax_percentage: 10, publish_at: Time.current) }
 
-  describe 'association' do
+  describe 'associations' do
     it { should have_many(:deal_images).dependent(:destroy) }
     it { should have_many(:line_items).dependent(:restrict_with_error) }
     it { should have_many(:orders).through(:line_items) }
@@ -11,9 +11,6 @@ RSpec.describe Deal, type: :model do
   end
 
   describe 'validations' do
-    it 'is valid with valid attributes' do
-      expect(subject).to be_valid
-    end
     it { should validate_presence_of(:title) }
     it { should validate_presence_of(:description) }
     it { should validate_presence_of(:price_in_cents) }
@@ -29,7 +26,7 @@ RSpec.describe Deal, type: :model do
   end
 
   describe 'scope' do
-    describe 'all deals' do
+    describe '#all_deals' do
       context 'when no deals exist' do
         it 'should not return any deal' do
           expect(Deal.all_deals).to be_empty
@@ -37,14 +34,14 @@ RSpec.describe Deal, type: :model do
       end
 
       context 'when at least one deal exist' do
-        let!(:deal) { create(:deal) }
         it 'should return deals' do
+          deal = create(:deal)
           expect(Deal.all_deals).to include(deal)
         end
       end
     end
 
-    describe 'live' do
+    describe '#live' do
       context 'there are no live deal' do
         it 'should return empty list' do
           expect(Deal.live).to be_empty
@@ -52,14 +49,16 @@ RSpec.describe Deal, type: :model do
       end
 
       context 'when at least one live deal exist' do
-        let!(:deal) { create(:deal, published_at: Time.current, publishable: true) }
         it 'should return live deals' do
-          expect(Deal.live).to include(deal)
+          deal1 =  create(:deal, published_at: Time.current, publishable: true)
+          deal2 =  create(:deal, published_at: 1.day.ago, publishable: false)
+          expect(Deal.live).to include(deal1)
+          expect(Deal.live).not_to include(deal2)
         end
       end
     end
 
-    describe 'expired' do
+    describe '#expired' do
       context 'there are no expired deal' do
         it 'should return empty list' do
           expect(Deal.expired).to be_empty
@@ -67,14 +66,16 @@ RSpec.describe Deal, type: :model do
       end
 
       context 'when at least one expired deal exist' do
-        let!(:deal) { create(:deal, published_at: 1.day.ago, publishable: false) }
         it 'should return expired deals' do
-          expect(Deal.expired).to include(deal)
+          deal1 = create(:deal, published_at: 1.day.ago, publishable: false)
+          deal2 =  create(:deal, published_at: Time.current, publishable: true)
+          expect(Deal.expired).to include(deal1)
+          expect(Deal.expired).not_to include(deal2)
         end
       end
     end
 
-    describe 'deals with revenue' do
+    describe '#deals_with_revenue' do
       let!(:user) { create(:user) }
       let!(:deal) { create(:deal) }
       let!(:line_items) { create_list(:line_item, 2, order: create(:order, user: create(:user), address: create(:address, user: user), status: :delivered), deal: deal) }

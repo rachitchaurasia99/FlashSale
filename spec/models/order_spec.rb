@@ -28,10 +28,10 @@ RSpec.describe Order, type: :model do
     end
 
     context 'deal_exists' do
-      let!(:deal){ create(:deal) }
-      let!(:line_item){ create(:line_item, deal: deal, order: order) }
-      let!(:deal_exists){ user.orders.deal_exists(deal) }
       it 'should contain the deal' do
+        deal = create(:deal)
+        line_item = create(:line_item, deal: deal, order: order)
+        deal_exists =  user.orders.deal_exists(deal) 
         expect(deal_exists).to include line_item.order
       end
     end
