@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe Deal, type: :model do
-  subject { Deal.new(title: 'abcd', description: 'This is a random deal', price_in_cents: 10000, discount_price_in_cents: 9000, quantity: 12, tax_percentage: 10, publish_at: Time.current) }
+  subject { create(:deal) }
 
   describe 'associations' do
     it { should have_many(:deal_images).dependent(:destroy) }
