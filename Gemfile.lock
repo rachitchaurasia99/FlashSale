@@ -76,9 +76,6 @@ GEM
     bootsnap (1.16.0)
       msgpack (~> 1.2)
     builder (3.2.4)
-    bullet (7.0.7)
-      activesupport (>= 3.0.0)
-      uniform_notifier (~> 1.11)
     case_transform (0.2)
       activesupport
     concurrent-ruby (1.2.2)
@@ -222,7 +219,6 @@ GEM
       railties (>= 6.0.0)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
-    uniform_notifier (1.16.0)
     tzinfo-data (1.2023.3)
       tzinfo (>= 1.0.0)
     warden (1.2.9)
@@ -245,7 +241,6 @@ DEPENDENCIES
   active_model_serializers (~> 0.10.0)
   bcrypt (~> 3.1.7)
   bootsnap
-  bullet (~> 7.0.7)
   debug
   devise (~> 4.9.2)
   discard (~> 1.2)

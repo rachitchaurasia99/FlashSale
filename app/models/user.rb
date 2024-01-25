@@ -6,7 +6,7 @@ class User < ApplicationRecord
 
   enum role: { customer: 0, admin: 1 }
 
-  has_many :orders
+  has_many :orders, dependent: :destroy
   has_many :payments, through: :orders
   has_many :addresses, dependent: :destroy
   has_and_belongs_to_many :coupons, join_table: 'user_coupons'

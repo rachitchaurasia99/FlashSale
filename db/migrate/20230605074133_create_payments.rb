@@ -5,8 +5,8 @@ class CreatePayments < ActiveRecord::Migration[7.0]
       t.string :session_id
       t.string :payment_intent
       t.string :currency
-      t.integer :status
-      t.integer :total_amount_in_cents
+      t.integer :status, default: 0
+      t.integer :total_amount_in_cents, default: 0
       
       t.timestamps
     end
