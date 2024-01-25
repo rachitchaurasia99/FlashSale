@@ -9,6 +9,6 @@ module ApplicationHelper
   end
 
   def price_in_currency(price)
-    price.to_fs(:currency, unit: '₹', format: '%u %n')
+    price.to_fs(:currency, unit: '$', format: '%u %n')
   end
 end

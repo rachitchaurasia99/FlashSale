@@ -1,5 +1,8 @@
 class Deal < ApplicationRecord
   has_many :deal_images, dependent: :destroy
+  has_many :line_items, dependent: :restrict_with_error
+  has_many :orders, through: :line_items
+
   accepts_nested_attributes_for :deal_images, allow_destroy: true, reject_if: proc { |attributes| attributes[:image].blank? }
 
   validates :title, :description, :price_in_cents, :discount_price_in_cents, :quantity, :tax_percentage, :publish_at, presence: true
@@ -16,10 +19,16 @@ class Deal < ApplicationRecord
 
   validate :valid_publish_at, on: :update
 
-  scope :live, ->{ where(publishable: true).where.not(published_at: nil) }
-  scope :expired, ->{ where(publishable: false).where.not(published_at: nil) }
-  scope :publishable_on, ->(date) { where(publish_at: date) }
+  before_validation :calculate_tax_on_deal
 
+  scope :all_deals, ->{ includes(deal_images: { image_attachment: :blob }) }
+  scope :live, ->{ all_deals.where(publishable: true).where.not(published_at: nil) }
+  scope :expired, ->{ live.rewhere(publishable: false) }
+  scope :publishable_on, ->(date) { where(publish_at: date) }
+  scope :to_publish, ->{ where('DATE(publish_at) = ?', Date.current).where(published_at: nil).where(publishable: true) }
+  scope :to_unpublish, ->{ where('DATE(publish_at) = ?', Date.yesterday).where.not(published_at: nil).where(publishable: true) }
+  scope :deals_with_revenue, ->{ joins(:orders).where(orders: {status: 'delivered'}).group(:id).select('deals.*, COUNT(orders.id) as orders_count') }
+  scope :expiring_soon, ->(order){ joins(:orders).where(orders: { id: order } ).where('published_at < ?', Time.current - LIVE_DEAL_DURATION - MINIMUM_TIME_TO_CANCEL_ORDER) }
 
   def price
     price_in_cents * 0.01
@@ -28,7 +37,31 @@ class Deal < ApplicationRecord
   def discount_price
     discount_price_in_cents * 0.01
   end
-  
+
+  def unit_price
+    price_in_cents * 0.01
+  end
+
+  def discount_price
+    discount_price_in_cents * 0.01
+  end
+
+  def deal_price_with_tax
+    discount_price + tax_on_deal
+  end
+
+  def tax_on_deal
+    tax_in_cents * 0.01
+  end
+
+  def calculate_tax_on_deal
+    self.tax_in_cents = discount_price * tax_percentage if discount_price_in_cents && tax_percentage
+  end
+
+  def expiring_soon?
+    published_at + LIVE_DEAL_DURATION - Time.current < MINIMUM_TIME_TO_CANCEL_ORDER
+  end
+
   private
   
   def images_count

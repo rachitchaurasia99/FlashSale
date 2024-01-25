@@ -1,10 +1,10 @@
 class CreateDeals < ActiveRecord::Migration[7.0]
   def change
     create_table :deals do |t|
-      t.string :title
+      t.string :title, unique: true
       t.string :description
-      t.integer :price_in_cents
-      t.integer :discount_price_in_cents
+      t.integer :price_in_cents, default: 0
+      t.integer :discount_price_in_cents, default: 0
       t.integer :quantity, default: 0
       t.datetime :publish_at
       t.datetime :published_at
