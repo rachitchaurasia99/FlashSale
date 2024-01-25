@@ -2,17 +2,14 @@ class Address < ApplicationRecord
   belongs_to :user
   has_many :orders
   
-  validates :name, :email, :city, :state, :country, :pincode, presence: true
+  validates :city, :state, :country, :pincode, presence: true
+  validates :city, uniqueness: { scope: [:state, :country, :pincode] }
 
-  validates :city, uniqueness: { scope: [:state, :country, :pincode], message: ', State, Country and Pincode combination already taken' }
+  # before_validation :check_duplicate_address, on: :create
 
-  # validate :address_validator
+  # scope :find_address,->(city,state,country,pincode,user){ where(city: city, state: state, country: country, pincode: pincode, user: user) }
 
-  # before_validation :address_validator
-
-  def address_validator
-    if Address.where(city: city, state: state, country: country, pincode: pincode).where.not(id: self.id).first
-      errors.add(:base, 'Address already exists')
-    end
-  end
+  # def check_duplicate_address
+  #   errors.add(:base,'Address already exists') unless self.class.find_address(city,state,country,pincode,user).empty?
+  # end
 end
