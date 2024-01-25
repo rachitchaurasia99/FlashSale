@@ -1,4 +1,4 @@
 class DealImage < ApplicationRecord
   belongs_to :deal
-  has_one_attached :image, dependent: :delete
+  has_one_attached :image
 end

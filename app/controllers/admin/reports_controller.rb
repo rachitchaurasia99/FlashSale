@@ -9,7 +9,11 @@ class Admin::ReportsController < Admin::BaseController
 
   def customers
     if params[:from].present? && params[:to].present?
-      @customers = User.customers_orders(params[:from]&.to_datetime, params[:to].to_datetime)
+      @customers = User.customers_orders(params[:from], params[:to])
+    elsif params[:from].present?
+      @customers = User.customers_orders(params[:from])
+    elsif params[:to].present?
+      @customers = User.customers_orders(Date.new(0), params[:to])
     else
       @customers = User.customers_orders
     end

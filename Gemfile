@@ -14,8 +14,6 @@ gem 'sidekiq', "~> 6.0.0"
 
 gem 'sidekiq-scheduler', "~> 5.0.3"
 
-gem 'bullet', '~> 7.0.7'
-
 gem 'active_model_serializers', '~> 0.10.0'
 
 gem 'discard', '~> 1.2'

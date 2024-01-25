@@ -1,7 +1,7 @@
 <h1>Order Summary</h1>
 <% @order.line_items.each do |line_item| %>
   <%= render line_item %>
-  <%= button_to 'Remove' , remove_from_cart_order_path(line_item) %>
+  <%= button_to 'Remove' , remove_from_cart_order_path(line_item), class: 'btn btn-primary' %>
   </br>
 <% end %>
 </br>

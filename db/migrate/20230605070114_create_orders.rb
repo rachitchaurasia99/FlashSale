@@ -9,7 +9,7 @@ class CreateOrders < ActiveRecord::Migration[7.0]
       t.integer :discount_price_in_cents, default: 0
       t.integer :loyality_discount_in_cents, default: 0
       t.integer :net_in_cents, default: 0
-      t.integer :status
+      t.integer :status, default: 0
       t.timestamps
     end
   end
