@@ -2,10 +2,12 @@ class Order < ApplicationRecord
   enum :status, { in_progress: 0, placed: 1, delivered: 2, cancelled: 3 }
   
   belongs_to :user
-  belongs_to :address, optional: true
-  has_many :payments
-  has_many :refunds
-  has_many :line_items, dependent: :destroy, after_add: :add_to_cart, after_remove: :remove_from_cart
+  belongs_to :address, optional:true
+  with_options dependent: :destroy do
+    has_many :payments
+    has_many :refunds
+    has_many :line_items, after_add: :add_to_cart, after_remove: :remove_from_cart
+  end
   has_many :deals, through: :line_items
   
   scope :placed_orders, ->{ includes(:address, :payments).where(status: 'placed').where(payments: { status: 'successful' }) }
